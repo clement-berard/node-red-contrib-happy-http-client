@@ -1,0 +1,29 @@
+include ../../../../.node-red-dxp/pug-helper
+include ../../../common/editor/commonFields
+
++pkgBetaWarning
++dxpFormRowInputText('name', 'name', 'tag', 'name')
++dxpFormRowSelectConfigNode('clientInstance', 'Client', 'server')
+    +dxpHint
+        | Client is not required
++dxpFormRowInputTextTyped('endpoint', 'Endpoint', 'globe')
+    +dxpHint
+        | Endpoint or full URL without client
++dxpFormRowInputTextTyped('method', 'Method', 'envelope-o')
++dxpTabs('tabs-request-node')
+    #tab-request.hidden
+        +commonRequestFields(false)
+        +dxpFormRowInputTextTyped('body', 'Body', 'align-left', 'Body')
+        +requestFieldsKeepAlive(false)
+        +requestFieldsConnectionTimeout(false)
+    #tab-response.hidden
+        +dxpFormRowCheckbox('throwErrorOnError', 'Throw Error', 'exclamation-circle', 'Throw error if HTTP response status code other than 2xx')(checked)
+        +dxpFormRowSelect('responseFormat', 'Format', 'share-square-o')
+            +dxpHint
+                | Response format
+        +dxpFormTitleSeparator('Node outputs')
+        +dxpFormRowCheckbox('splitBooleanOutputs', 'Split out', 'map-signs', 'Split in two distinct outputs success/error')
+    #tab-auth.hidden
+        +requestAuthFields
+    #tab-advanced.hidden
+        +requestAdvancedFields(false)
