@@ -1,0 +1,7 @@
+{
+  "builder": {
+    "esbuildControllerOptions": {
+      "includeInBundle": ["radash"]
+    }
+  }
+}

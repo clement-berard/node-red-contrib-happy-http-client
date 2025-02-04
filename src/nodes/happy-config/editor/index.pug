@@ -1,0 +1,15 @@
+include ../../../../.node-red-dxp/pug-helper
+include ../../../common/editor/commonFields
+
++pkgBetaWarning
++dxpFormRowInputText('name', 'name', 'tag', 'name', true)
++dxpTabs('tabs')
+    #tab-endpoint.hidden
+        +dxpFormRowInputText('baseUrl', 'Base URL', 'globe', 'Base URL', true)
+        +commonRequestFields(true)
+        +requestFieldsKeepAlive(true)
+        +requestFieldsConnectionTimeout(true)
+    #tab-auth.hidden
+        +requestAuthFields
+    #tab-advanced.hidden
+        +requestAdvancedFields(true)

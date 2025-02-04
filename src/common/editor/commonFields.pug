@@ -1,0 +1,48 @@
+mixin pkgBetaWarning
+    .alert.alert-info
+        | Node is in Beta state.
+
+mixin pkgComingSoon
+    .alert.alert-info.italic
+        | Coming soon...
+
+mixin commonRequestFields(isConfig)
+    +dxpFormRowInputTextTyped('defaultArgsHeaders', 'Headers', 'table', 'Headers', isConfig)
+        +dxpHint
+            if isConfig
+                | Defaults request headers
+            else
+                | Request headers (merge and override client)
+            |  (json)
+    +dxpFormRowInputTextTyped('defaultArgsQueryParams', 'Params', 'table', 'Params', isConfig)
+        +dxpHint
+            if isConfig
+                | Defaults request query params
+            else
+                | Request query params (merge and override client)
+            |  (json)
+
+mixin requestFieldsKeepAlive(isConfig)
+    +dxpFormRowInputTextTyped('connectionKeepAlive', 'Keep-Alive', '', '' , isConfig)
+        +dxpHint
+            |  Must be a number in ms (0 is off)
+
+mixin requestFieldsConnectionTimeout(isConfig)
+    +dxpFormRowInputTextTyped('connectionTimeout', 'Timeout', 'clock-o', 'Timeout', isConfig)
+        +dxpHint
+            |  Must be a number in ms
+
+mixin requestAdvancedFields(isConfig)
+    +dxpFormTitleSeparator('TLS')
+    +dxpFormRowInputTextTyped('caRejectUnauthorized', 'Reject', '', 'Reject Unauthorized', isConfig)
+        +dxpHint Verify server certificate
+    +dxpFormTitleSeparator('Proxy')
+    +pkgComingSoon
+
+mixin requestAuthFields(isConfig)
+    +dxpFormTitleSeparator('Basic Auth')
+    +pkgComingSoon
+    +dxpFormTitleSeparator('Digest Auth')
+    +pkgComingSoon
+    +dxpFormTitleSeparator('Bearer Token')
+    +pkgComingSoon
