@@ -43,6 +43,12 @@ const HappyConfig = createEditorNode<NodeEditorProps<NodeHappyConfigProps>, Node
     });
 
     applyTypedField({
+      valueType: 'str',
+      selector: '$$requestAuthBearerToken',
+      withInherit: false,
+    });
+
+    applyTypedField({
       valueType: 'num',
       selector: '$$connectionTimeout',
       withInherit: false,

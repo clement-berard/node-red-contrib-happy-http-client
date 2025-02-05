@@ -75,12 +75,20 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>>({
     });
 
     applyTypedField({
+      valueType: 'str',
+      selector: '$requestAuthBearerToken',
+      withInheritLabel: 'none',
+      withInherit: true,
+    });
+
+    applyTypedField({
       valueType: 'num',
       selector: '$connectionKeepAlive',
       withInheritLabel: '4000ms',
       withInherit: true,
       defaultValue: this.connectionKeepAlive,
     });
+
     applyTypedField({
       valueType: 'num',
       selector: '$connectionTimeout',

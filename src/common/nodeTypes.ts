@@ -12,6 +12,8 @@ export interface CommonNodeFields {
   connectionTimeoutType: string;
   caRejectUnauthorized: boolean;
   caRejectUnauthorizedType: string;
+  requestAuthBearerToken: string;
+  requestAuthBearerTokenType: string;
 }
 
 export interface NodeHappyConfigProps extends CommonNodeFields {

@@ -62,9 +62,9 @@ Designed for ultimate flexibility, making it adaptable to any HTTP use case.
 
 ### 🔐 Auth
 
+- Bearer Token ✅
 - Basic Auth (_coming soon_...)
 - Digest Auth (_coming soon_...)
-- Bearer Token (_coming soon_...)
 
 ### 🚀 Built with `urllib`
 
