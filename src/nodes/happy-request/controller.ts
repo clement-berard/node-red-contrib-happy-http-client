@@ -29,12 +29,15 @@ export default function (
       resolvedConnectionKeepAlive,
       resolvedCaRejectUnauthorized,
       urlToFetch,
+      resolvedRequestAuthBearerToken,
     } = await resolveRequestInformation({
       node: this,
       msg,
       currentNode: config,
       clientInstance,
     });
+
+    console.log('resolvedRequestAuthBearerToken', resolvedRequestAuthBearerToken);
 
     const isValidUrl = isUrl(urlToFetch);
 

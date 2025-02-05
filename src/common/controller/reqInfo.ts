@@ -82,15 +82,27 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     withInherit: isFromClient.caRejectUnauthorized,
   });
 
+  const [, , resolvedRequestAuthBearerToken] = await resolveEachNodes('requestAuthBearerToken', {
+    defaultValue: '',
+    withInherit: isFromClient.requestAuthBearerToken,
+  });
+
   const [clientInstanceHeaders, nodeInstanceHeaders] = await resolveEachNodes('defaultArgsHeaders');
   const [clientInstanceQueryParams, nodeInstanceQueryParams] = await resolveEachNodes('defaultArgsQueryParams');
+
+  const requestHeaders = {
+    ...assign(clientInstanceHeaders, nodeInstanceHeaders),
+    ...(resolvedRequestAuthBearerToken && {
+      authorization: `Bearer ${resolvedRequestAuthBearerToken}`,
+    }),
+  };
 
   const urlToFetch = !isEmpty(configInstance?.clientInstanceBaseUrl)
     ? resolveUrlWithBase(configInstance.clientInstanceBaseUrl, nodeInstance.resolvedNodeEndpoint)
     : nodeInstance.resolvedNodeEndpoint;
 
   return {
-    resolvedRequestHeaders: assign(clientInstanceHeaders, nodeInstanceHeaders),
+    resolvedRequestHeaders: requestHeaders,
     resolvedRequestQueryParams: assign(clientInstanceQueryParams, nodeInstanceQueryParams),
     resolvedRequestMethod: nodeInstance.nodeInstanceMethod,
     resolvedRequestBody: nodeInstance.nodeInstanceBody,
@@ -98,5 +110,6 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     resolvedConnectionTimeout,
     resolvedConnectionKeepAlive,
     resolvedCaRejectUnauthorized,
+    resolvedRequestAuthBearerToken,
   };
 }

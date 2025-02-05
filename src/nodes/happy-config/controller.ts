@@ -22,4 +22,6 @@ export default function (
   this.connectionTimeoutType = config.connectionTimeoutType;
   this.caRejectUnauthorized = config.caRejectUnauthorized;
   this.caRejectUnauthorizedType = config.caRejectUnauthorizedType;
+  this.requestAuthBearerToken = config.requestAuthBearerToken;
+  this.requestAuthBearerTokenType = config.requestAuthBearerTokenType;
 }
