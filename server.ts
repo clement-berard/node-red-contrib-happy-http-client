@@ -1,7 +1,7 @@
-import express, { Request, Response, NextFunction } from 'express';
-import basicAuth from 'basic-auth';
-import jwt from 'jsonwebtoken';
 import axios from 'axios';
+import basicAuth from 'basic-auth';
+import express, { type Request, type Response, type NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const PORT = 3002;
@@ -10,7 +10,10 @@ const BEARER_SECRET = 'your-secret-key'; // Change this secret to a secure one
 // Middleware for Basic Auth
 const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const user = basicAuth(req);
-  if (user && user.name === 'admin' && user.pass === 'password') { // Change username and password
+  const authHeader = req.headers['authorization'];
+
+  if (user && user.name === 'admin' && user.pass === 'password') {
+    // Change username and password
     return next();
   }
   res.set('WWW-Authenticate', 'Basic realm="example"');
@@ -26,7 +29,7 @@ const bearerAuthMiddleware = (req: Request, res: Response, next: NextFunction) =
     console.log('token', token);
     try {
       // jwt.verify(token, BEARER_SECRET);
-      if(token === 'tonton') return next();
+      if (token === 'tonton') return next();
     } catch (err) {
       return res.status(403).send('Invalid token.');
     }
@@ -56,7 +59,7 @@ app.get('/protected-basic', basicAuthMiddleware, (req: Request, res: Response) =
 
 // Protected route with Bearer Token
 app.get('/protected-bearer', bearerAuthMiddleware, (req: Request, res: Response) => {
-  res.json({ok: 'This is a protected route using Bearer Token Auth.'});
+  res.json({ ok: 'This is a protected route using Bearer Token Auth.' });
 });
 
 // Start the server

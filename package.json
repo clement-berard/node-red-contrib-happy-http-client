@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@keload/node-red-dxp": "^1.22.0",
+    "@keload/node-red-dxp": "^1.23.0",
     "@release-it/conventional-changelog": "9.0.4",
     "@types/jquery": "3.5.32",
     "@types/jqueryui": "1.12.23",

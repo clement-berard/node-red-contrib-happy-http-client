@@ -14,6 +14,11 @@ export interface CommonNodeFields {
   caRejectUnauthorizedType: string;
   requestAuthBearerToken: string;
   requestAuthBearerTokenType: string;
+  requestAuthKind: string;
+  requestAuthUsername: string;
+  requestAuthUsernameType: string;
+  requestAuthPassword: string;
+  requestAuthPasswordType: string;
 }
 
 export interface NodeHappyConfigProps extends CommonNodeFields {

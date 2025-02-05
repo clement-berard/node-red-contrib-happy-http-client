@@ -24,4 +24,9 @@ export default function (
   this.caRejectUnauthorizedType = config.caRejectUnauthorizedType;
   this.requestAuthBearerToken = config.requestAuthBearerToken;
   this.requestAuthBearerTokenType = config.requestAuthBearerTokenType;
+  this.requestAuthKind = config.requestAuthKind;
+  this.requestAuthUsername = config.requestAuthUsername;
+  this.requestAuthUsernameType = config.requestAuthUsernameType;
+  this.requestAuthPassword = config.requestAuthPassword;
+  this.requestAuthPasswordType = config.requestAuthPasswordType;
 }

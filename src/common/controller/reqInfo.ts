@@ -15,7 +15,7 @@ type ResolveRequestInformationParams = {
   clientInstance: NodeHappyConfigProps;
 };
 
-function resolveWithInheritClient(clientValue: any, nodeValue: any, inherit: boolean) {
+function resolveWithInheritClient(clientValue: unknown, nodeValue: unknown, inherit: boolean) {
   if (!inherit) {
     return nodeValue;
   }
@@ -39,7 +39,10 @@ async function getTwoNodes(params: ResolveRequestInformationParams) {
 
   const { quickNodePropertyEval } = useControllerNode(params.node, params.msg);
 
-  async function resolveEachNodes(key: keyof CommonNodeFields, opts?: { defaultValue?: any; withInherit?: boolean }) {
+  async function resolveEachNodes(
+    key: keyof CommonNodeFields,
+    opts?: { defaultValue?: unknown; withInherit?: boolean },
+  ) {
     const { defaultValue, withInherit = false } = opts || {};
     const [resNode, resConfig] = await Promise.all([
       quickNodePropertyEval(nodeInstance.currentNodeInstance, key, {
@@ -87,6 +90,25 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     withInherit: isFromClient.requestAuthBearerToken,
   });
 
+  const [clientInstanceRequestAuthKind, nodeInstanceRequestAuthKind] = await resolveEachNodes('requestAuthKind', {
+    defaultValue: '',
+  });
+
+  const realAuthKind =
+    nodeInstanceRequestAuthKind === 'from_client_or_none' ? clientInstanceRequestAuthKind : nodeInstanceRequestAuthKind;
+
+  const hasAuthKind = realAuthKind !== undefined && realAuthKind !== 'none';
+
+  const [, , resolvedRequestAuthUsername] = await resolveEachNodes('requestAuthUsername', {
+    defaultValue: '',
+    withInherit: isFromClient.requestAuthUsername && clientInstanceRequestAuthKind !== 'none',
+  });
+
+  const [, , resolvedRequestAuthPassword] = await resolveEachNodes('requestAuthPassword', {
+    defaultValue: '',
+    withInherit: isFromClient.requestAuthPassword && clientInstanceRequestAuthKind !== 'none',
+  });
+
   const [clientInstanceHeaders, nodeInstanceHeaders] = await resolveEachNodes('defaultArgsHeaders');
   const [clientInstanceQueryParams, nodeInstanceQueryParams] = await resolveEachNodes('defaultArgsQueryParams');
 
@@ -111,5 +133,11 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     resolvedConnectionKeepAlive,
     resolvedCaRejectUnauthorized,
     resolvedRequestAuthBearerToken,
+    resolvedRequestAuth: {
+      hasAuth: hasAuthKind,
+      authKind: realAuthKind as 'basic' | 'digest',
+      username: resolvedRequestAuthUsername,
+      password: resolvedRequestAuthPassword,
+    },
   };
 }

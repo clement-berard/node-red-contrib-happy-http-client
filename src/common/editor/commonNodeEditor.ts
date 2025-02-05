@@ -1,5 +1,5 @@
-import { jqSelector, resolveSelector } from '@keload/node-red-dxp/editor/dom-helper';
-import { isEmpty } from 'radash';
+import { initSelect, jqSelector, resolveSelector, watchInput } from '@keload/node-red-dxp/editor/dom-helper';
+import { isEmpty, title } from 'radash';
 import { CONSTANTS } from '../constants';
 import { DEFAULT_VALUES } from '../defaultValues';
 import type { CommonNodeFields } from '../nodeTypes';
@@ -26,10 +26,15 @@ export function getCommonDefaultFields(params: GetCommonDefaultFields = {}): Rec
     caRejectUnauthorizedType: { ...fromClientOr('bool') },
     requestAuthBearerToken: { value: '', type: 'str' },
     requestAuthBearerTokenType: { ...fromClientOr('str') },
+    requestAuthKind: { value: '', type: 'str' },
+    requestAuthUsername: { value: '', type: 'str' },
+    requestAuthUsernameType: { ...fromClientOr('str') },
+    requestAuthPassword: { value: '', type: 'str' },
+    requestAuthPasswordType: { ...fromClientOr('str') },
   };
 }
 
-export const COMMON_INPUT_TYPED_TYPES = ['jsonata', 'msg', 'flow', 'global'];
+export const COMMON_INPUT_TYPED_TYPES = ['jsonata', 'msg', 'flow', 'global', 'env'];
 
 type ApplyTypedField = {
   selector: string;
@@ -89,4 +94,49 @@ export function applyTypedField(params: ApplyTypedField) {
     // @ts-ignore
     wd.typedInput('value', defaultValue);
   }
+}
+
+export function initAuthFields(innerSelectorVal: string, initialValue: string, isConfig = false) {
+  const prefix = isConfig ? '$$' : '$';
+  const selectValues = ['none', 'basic', 'digest'];
+
+  if (!isConfig) {
+    selectValues.unshift('from_client_or_none');
+  }
+
+  initSelect(
+    `${prefix}${innerSelectorVal}`,
+    selectValues.map((i) => ({ text: title(i), value: i })),
+    {
+      selected: initialValue,
+    },
+  );
+
+  applyTypedField({
+    valueType: 'str',
+    selector: `${prefix}requestAuthUsername`,
+    withInherit: !isConfig,
+  });
+
+  applyTypedField({
+    valueType: 'str',
+    selector: `${prefix}requestAuthPassword`,
+    withInherit: !isConfig,
+  });
+
+  watchInput(
+    [`${prefix}${innerSelectorVal}`],
+    (val) => {
+      const [valField, valType] = val;
+      const authorizedValues = ['basic', 'digest'];
+      if (authorizedValues.includes(valField) || authorizedValues.includes(valType)) {
+        jqSelector('.auth-cred-container').removeClass('hidden');
+      } else {
+        jqSelector('.auth-cred-container').addClass('hidden');
+      }
+    },
+    {
+      additionalEvents: ['change', 'keyup'],
+    },
+  );
 }
