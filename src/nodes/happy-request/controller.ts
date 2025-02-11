@@ -29,15 +29,13 @@ export default function (
       resolvedConnectionKeepAlive,
       resolvedCaRejectUnauthorized,
       urlToFetch,
-      resolvedRequestAuthBearerToken,
+      resolvedRequestAuth,
     } = await resolveRequestInformation({
       node: this,
       msg,
       currentNode: config,
       clientInstance,
     });
-
-    console.log('resolvedRequestAuthBearerToken', resolvedRequestAuthBearerToken);
 
     const isValidUrl = isUrl(urlToFetch);
 
@@ -54,8 +52,8 @@ export default function (
     const currentHttpClient = new HttpClient({
       ...clientHttpOptions,
       connect: {
-        timeout: resolvedConnectionTimeout,
-        rejectUnauthorized: resolvedCaRejectUnauthorized,
+        timeout: Number(resolvedConnectionTimeout),
+        rejectUnauthorized: Boolean(resolvedCaRejectUnauthorized),
       },
     });
 
@@ -68,7 +66,15 @@ export default function (
         headers: resolvedRequestHeaders,
         data: resolvedRequestBody,
         dataType: config.responseFormat,
-        keepAliveTimeout: resolvedConnectionKeepAlive,
+        keepAliveTimeout: Number(resolvedConnectionKeepAlive),
+        ...(resolvedRequestAuth.hasAuth &&
+          resolvedRequestAuth.authKind === 'basic' && {
+            auth: `${resolvedRequestAuth.username}:${resolvedRequestAuth.password}`,
+          }),
+        ...(resolvedRequestAuth.hasAuth &&
+          resolvedRequestAuth.authKind === 'digest' && {
+            digestAuth: `${resolvedRequestAuth.username}:${resolvedRequestAuth.password}`,
+          }),
       },
     });
 

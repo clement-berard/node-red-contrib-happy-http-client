@@ -1,7 +1,7 @@
 import { type NodeEditorProps, createEditorNode } from '@keload/node-red-dxp/editor';
 import { initTabs } from '@keload/node-red-dxp/editor/dom-helper';
 
-import { applyTypedField, getCommonDefaultFields } from '../../../common/editor/commonNodeEditor';
+import { applyTypedField, getCommonDefaultFields, initAuthFields } from '../../../common/editor/commonNodeEditor';
 import type { NodeHappyConfigProps } from '../../../common/nodeTypes';
 
 interface NodeCredentials {
@@ -26,7 +26,7 @@ const HappyConfig = createEditorNode<NodeEditorProps<NodeHappyConfigProps>, Node
   label: function () {
     return this.name || 'HappyConfig';
   },
-  oneditprepare: () => {
+  oneditprepare: function () {
     // biome-ignore lint/complexity/noForEach: <explanation>
     ['defaultArgsHeaders', 'defaultArgsQueryParams'].forEach((selector) => {
       applyTypedField({
@@ -59,6 +59,8 @@ const HappyConfig = createEditorNode<NodeEditorProps<NodeHappyConfigProps>, Node
       selector: '$$caRejectUnauthorized',
       withInherit: false,
     });
+
+    initAuthFields('requestAuthKind', this.requestAuthKind, true);
 
     initTabs({
       targetId: 'tabs',
