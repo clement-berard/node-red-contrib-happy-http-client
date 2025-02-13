@@ -1,7 +1,7 @@
 import { isEmpty } from 'radash';
-import type { HttpClient, RequestOptions } from 'urllib';
+import type { HttpClient, HttpMethod, RequestOptions } from 'urllib';
 
-export const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
+export const HTTP_METHODS: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
 export const REQUEST_RESPONSE_FORMAT: RequestOptions['dataType'][] = ['json', 'text', 'html', 'buffer', 'stream'];
 
 type HandleRequestParams = {
@@ -30,7 +30,7 @@ export async function handleRequest(params: HandleRequestParams) {
         url: fullUrl,
         reqOptions,
       },
-      response: resp.res,
+      response: resp,
     };
 
     if (!ok) {
