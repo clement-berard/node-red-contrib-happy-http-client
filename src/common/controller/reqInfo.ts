@@ -128,6 +128,7 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     resolvedRequestQueryParams: assign(clientInstanceQueryParams, nodeInstanceQueryParams),
     resolvedRequestMethod: nodeInstance.nodeInstanceMethod,
     resolvedRequestBody: nodeInstance.nodeInstanceBody,
+    resolvedRequestBodyContentType: nodeInstance.nodeInstanceBodyContentType,
     urlToFetch,
     resolvedConnectionTimeout,
     resolvedConnectionKeepAlive,

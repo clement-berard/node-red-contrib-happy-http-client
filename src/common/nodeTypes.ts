@@ -32,6 +32,7 @@ export interface NodeHappyRequestProps extends CommonNodeFields {
   method: string;
   methodType: string;
   body: string;
+  bodyContentType: string;
   bodyType: string;
   throwErrorOnError: boolean;
   splitBooleanOutputs: boolean;
