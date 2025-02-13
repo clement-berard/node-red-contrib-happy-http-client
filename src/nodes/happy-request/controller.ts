@@ -65,7 +65,9 @@ export default function (
       reqOptions: {
         method: resolvedRequestMethod,
         headers: resolvedRequestHeaders,
-        data: resolvedRequestBody,
+        ...(resolvedRequestMethod !== 'GET' && {
+          data: resolvedRequestBody,
+        }),
         dataType: config.responseFormat,
         keepAliveTimeout: Number(resolvedConnectionKeepAlive),
         ...(resolvedRequestAuth.hasAuth &&

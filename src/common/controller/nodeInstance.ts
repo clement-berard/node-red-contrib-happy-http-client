@@ -1,5 +1,6 @@
 import { useControllerNode } from '@keload/node-red-dxp/utils/controller';
 import type { Node, NodeMessage } from 'node-red';
+import type { HttpMethod } from 'urllib';
 import { CONSTANTS } from '../constants';
 import { HTTP_METHODS } from '../httpClient';
 import type { NodeHappyRequestProps } from '../nodeTypes';
@@ -17,7 +18,7 @@ export async function getComputedNodeInstance(params: {
 
   const resolvedNodeEndpoint = await quickNodePropertyEval(currentNode, 'endpoint');
   const nodeInstanceBody = await quickNodePropertyEval(currentNode, 'body');
-  const nodeInstanceMethod = HTTP_METHODS.includes(currentNode.methodType)
+  const nodeInstanceMethod: HttpMethod = HTTP_METHODS.includes(currentNode.methodType)
     ? currentNode.methodType
     : await quickNodePropertyEval(currentNode, 'method');
 
