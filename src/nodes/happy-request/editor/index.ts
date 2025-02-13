@@ -8,7 +8,7 @@ import {
 } from '@keload/node-red-dxp/editor/dom-helper';
 
 import { applyTypedField, getCommonDefaultFields, initAuthFields } from '../../../common/editor/commonNodeEditor';
-import { HTTP_METHODS, REQUEST_RESPONSE_FORMAT } from '../../../common/httpClient';
+import { HTTP_METHODS, REQUEST_BODY_CONTENT_TYPES, REQUEST_RESPONSE_FORMAT } from '../../../common/httpClient';
 import type { NodeHappyRequestProps } from '../../../common/nodeTypes';
 
 const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>>({
@@ -24,6 +24,7 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>>({
     throwErrorOnError: { value: true },
     outputs: { value: 1 },
     body: { value: 'payload', required: false },
+    bodyContentType: { value: 'json', required: false },
     bodyType: { value: 'msg', required: false },
     responseFormat: { value: 'json' },
     ...getCommonDefaultFields({ forConfig: false }),
@@ -117,6 +118,14 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>>({
       REQUEST_RESPONSE_FORMAT.map((i) => ({ value: i, text: i })),
       {
         selected: this.responseFormat,
+      },
+    );
+
+    initSelect(
+      '$bodyContentType',
+      REQUEST_BODY_CONTENT_TYPES.map((i) => ({ value: i.value, text: i.label })),
+      {
+        selected: this.bodyContentType,
       },
     );
   },

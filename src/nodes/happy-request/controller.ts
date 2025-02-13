@@ -26,6 +26,7 @@ export default function (
       resolvedRequestQueryParams,
       resolvedRequestMethod,
       resolvedRequestBody,
+      resolvedRequestBodyContentType,
       resolvedConnectionTimeout,
       resolvedConnectionKeepAlive,
       resolvedCaRejectUnauthorized,
@@ -67,6 +68,7 @@ export default function (
         headers: resolvedRequestHeaders,
         ...(resolvedRequestMethod !== 'GET' && {
           data: resolvedRequestBody,
+          contentType: resolvedRequestBodyContentType,
         }),
         dataType: config.responseFormat,
         keepAliveTimeout: Number(resolvedConnectionKeepAlive),

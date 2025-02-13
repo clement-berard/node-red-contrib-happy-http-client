@@ -14,6 +14,9 @@ include ../../../common/editor/commonFields
     #tab-request.hidden
         +commonRequestFields(false)
         +dxpFormRowInputTextTyped('body', 'Body', 'align-left', 'Body')
+        +dxpFormRowSelect('bodyContentType', 'Body Type', 'file-code-o ')
+            +dxpHint
+                | Body content type
         +requestFieldsKeepAlive(false)
         +requestFieldsConnectionTimeout(false)
     #tab-response.hidden

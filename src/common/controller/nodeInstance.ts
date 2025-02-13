@@ -18,6 +18,7 @@ export async function getComputedNodeInstance(params: {
 
   const resolvedNodeEndpoint = await quickNodePropertyEval(currentNode, 'endpoint');
   const nodeInstanceBody = await quickNodePropertyEval(currentNode, 'body');
+  const nodeInstanceBodyContentType = await quickNodePropertyEval(currentNode, 'bodyContentType');
   const nodeInstanceMethod: HttpMethod = HTTP_METHODS.includes(currentNode.methodType)
     ? currentNode.methodType
     : await quickNodePropertyEval(currentNode, 'method');
@@ -35,6 +36,7 @@ export async function getComputedNodeInstance(params: {
   return {
     nodeInstanceMethod,
     nodeInstanceBody: nodeInstanceBody || {},
+    nodeInstanceBodyContentType,
     resolvedNodeEndpoint,
     isFromClient,
     currentNodeInstance: currentNode,
