@@ -29,8 +29,6 @@ export function getCommonDefaultFields(params: GetCommonDefaultFields = {}): Rec
     requestAuthKind: { value: '', type: 'str' },
     requestAuthUsername: { value: '', type: 'str' },
     requestAuthUsernameType: { ...fromClientOr('str') },
-    requestAuthPassword: { value: '', type: 'str' },
-    requestAuthPasswordType: { ...fromClientOr('str') },
   };
 }
 

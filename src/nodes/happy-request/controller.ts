@@ -4,18 +4,22 @@ import { getREDNode, splitBooleanOutputs } from '@keload/node-red-dxp/utils/cont
 import { HttpClient } from 'urllib';
 import { resolveRequestInformation } from '../../common/controller/reqInfo';
 import { handleRequest } from '../../common/httpClient';
-import type { NodeHappyConfigProps, NodeHappyRequestProps } from '../../common/nodeTypes';
+import type { NodeHappyConfigAllProps, NodeHappyRequestAllProps } from '../../common/nodeTypes';
+
+export const credentials = {
+  requestAuthPasswordSecret: { type: 'text' },
+};
 
 export default function (
-  this: NodeControllerInst<NodeHappyRequestProps>,
-  config: NodeControllerConfig<NodeHappyRequestProps>,
+  this: NodeControllerInst<NodeHappyRequestAllProps>,
+  config: NodeControllerConfig<NodeHappyRequestAllProps>,
 ) {
   RED.nodes.createNode(this, config);
   this.status({});
 
   const clientHttpOptions = {};
 
-  const clientInstance = getREDNode<NodeHappyConfigProps>(config.clientInstance);
+  const clientInstance = getREDNode<NodeHappyConfigAllProps>(config.clientInstance);
 
   const { throwErrorOnError, splitBooleanOutputs: nodeSplitBooleanOutputs } = config;
 
@@ -35,7 +39,7 @@ export default function (
     } = await resolveRequestInformation({
       node: this,
       msg,
-      currentNode: config,
+      currentNode: { ...config, credentials: this.credentials },
       clientInstance,
     });
 

@@ -2,13 +2,9 @@ import { type NodeEditorProps, createEditorNode } from '@keload/node-red-dxp/edi
 import { initTabs } from '@keload/node-red-dxp/editor/dom-helper';
 
 import { applyTypedField, getCommonDefaultFields, initAuthFields } from '../../../common/editor/commonNodeEditor';
-import type { NodeHappyConfigProps } from '../../../common/nodeTypes';
+import type { NodeHappyConfigCredentials, NodeHappyConfigProps } from '../../../common/nodeTypes';
 
-interface NodeCredentials {
-  noop: boolean;
-}
-
-const HappyConfig = createEditorNode<NodeEditorProps<NodeHappyConfigProps>, NodeCredentials>({
+const HappyConfig = createEditorNode<NodeEditorProps<NodeHappyConfigProps>, NodeHappyConfigCredentials>({
   category: 'config',
   color: '#a6bbcf',
   defaults: {
@@ -16,9 +12,7 @@ const HappyConfig = createEditorNode<NodeEditorProps<NodeHappyConfigProps>, Node
     ...getCommonDefaultFields({ nameRequired: true, forConfig: true }),
   },
   credentials: {
-    noop: { type: 'text' },
-    // user: { type: 'text' },
-    // password: { type: 'password' },
+    requestAuthPasswordSecret: { type: 'text' },
   },
   inputs: 1,
   outputs: 1,

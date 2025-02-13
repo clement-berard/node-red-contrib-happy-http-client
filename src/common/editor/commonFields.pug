@@ -43,6 +43,6 @@ mixin requestAuthFields(isConfig)
     +dxpFormRowSelect('requestAuthKind', 'Type', '', isConfig)
     div.auth-cred-container.hidden
         +dxpFormRowInputTextTyped('requestAuthUsername', 'Username', 'user', '', isConfig)
-        +dxpFormRowInputTextTyped('requestAuthPassword', 'Password', 'lock', '', isConfig)(type="password")
+        +dxpFormRowInputText('requestAuthPasswordSecret', 'Password', 'lock', '', isConfig)(type="password")
     +dxpFormTitleSeparator('Bearer Token')
     +dxpFormRowInputTextTyped('requestAuthBearerToken', 'Bearer Token', '', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', isConfig)

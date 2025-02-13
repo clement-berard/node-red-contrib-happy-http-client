@@ -1,7 +1,7 @@
 import type { Node, NodeMessage } from 'node-red';
 import { assign, isEmpty } from 'radash';
 import { resolveUrlWithBase } from '../httpClient';
-import type { CommonNodeFields, NodeHappyConfigProps, NodeHappyRequestProps } from '../nodeTypes';
+import type { CommonNodeFields, NodeHappyConfigAllProps, NodeHappyRequestAllProps } from '../nodeTypes';
 import { getComputedNodeInstance } from './nodeInstance';
 
 import { useControllerNode } from '@keload/node-red-dxp/utils/controller';
@@ -11,8 +11,8 @@ import { getComputedClientInstance } from './configInstance';
 type ResolveRequestInformationParams = {
   node: Node;
   msg: NodeMessage;
-  currentNode: NodeHappyRequestProps;
-  clientInstance: NodeHappyConfigProps;
+  currentNode: NodeHappyRequestAllProps;
+  clientInstance: NodeHappyConfigAllProps;
 };
 
 function resolveWithInheritClient(clientValue: unknown, nodeValue: unknown, inherit: boolean) {
@@ -104,10 +104,15 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     withInherit: isFromClient.requestAuthUsername && clientInstanceRequestAuthKind !== 'none',
   });
 
-  const [, , resolvedRequestAuthPassword] = await resolveEachNodes('requestAuthPassword', {
-    defaultValue: '',
-    withInherit: isFromClient.requestAuthPassword && clientInstanceRequestAuthKind !== 'none',
-  });
+  const resolvedRequestAuthPasswordSecret = () => {
+    if (nodeInstance.credentials.requestAuthPasswordSecret) {
+      return nodeInstance.credentials.requestAuthPasswordSecret;
+    }
+    if (configInstance.credentials.requestAuthPasswordSecret) {
+      return configInstance.credentials.requestAuthPasswordSecret;
+    }
+    return '';
+  };
 
   const [clientInstanceHeaders, nodeInstanceHeaders] = await resolveEachNodes('defaultArgsHeaders');
   const [clientInstanceQueryParams, nodeInstanceQueryParams] = await resolveEachNodes('defaultArgsQueryParams');
@@ -138,7 +143,7 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
       hasAuth: hasAuthKind,
       authKind: realAuthKind as 'basic' | 'digest',
       username: resolvedRequestAuthUsername,
-      password: resolvedRequestAuthPassword,
+      password: resolvedRequestAuthPasswordSecret(),
     },
   };
 }

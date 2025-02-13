@@ -3,9 +3,9 @@ import { initSelect, initTabs, isCheckboxChecked } from '@keload/node-red-dxp/ed
 
 import { applyTypedField, getCommonDefaultFields, initAuthFields } from '../../../common/editor/commonNodeEditor';
 import { HTTP_METHODS, REQUEST_BODY_CONTENT_TYPES, REQUEST_RESPONSE_FORMAT } from '../../../common/httpClient';
-import type { NodeHappyRequestProps } from '../../../common/nodeTypes';
+import type { NodeHappyRequestProps, NodeHappyRequestPropsCredentials } from '../../../common/nodeTypes';
 
-const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>>({
+const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>, NodeHappyRequestPropsCredentials>({
   category: 'network',
   color: '#0593A2',
   defaults: {
@@ -22,6 +22,9 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>>({
     bodyType: { value: 'msg', required: false },
     responseFormat: { value: 'json' },
     ...getCommonDefaultFields({ forConfig: false }),
+  },
+  credentials: {
+    requestAuthPasswordSecret: { type: 'text' },
   },
   inputs: 1,
   outputs: 1,
