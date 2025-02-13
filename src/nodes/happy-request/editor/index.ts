@@ -1,11 +1,5 @@
 import { type NodeEditorProps, createEditorNode } from '@keload/node-red-dxp/editor';
-import {
-  initSelect,
-  initTabs,
-  isCheckboxChecked,
-  jqSelector,
-  watchInput,
-} from '@keload/node-red-dxp/editor/dom-helper';
+import { initSelect, initTabs, isCheckboxChecked } from '@keload/node-red-dxp/editor/dom-helper';
 
 import { applyTypedField, getCommonDefaultFields, initAuthFields } from '../../../common/editor/commonNodeEditor';
 import { HTTP_METHODS, REQUEST_BODY_CONTENT_TYPES, REQUEST_RESPONSE_FORMAT } from '../../../common/httpClient';
@@ -73,13 +67,6 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>>({
       withInherit: false,
       additionalTypesReadonly: HTTP_METHODS,
     });
-
-    // applyTypedField({
-    //   valueType: 'str',
-    //   selector: '$requestAuthKind',
-    //   withInherit: false,
-    //   additionalTypesReadonly: ['none', 'basic', 'digest'],
-    // });
 
     initAuthFields('requestAuthKind', this.requestAuthKind);
 
