@@ -40,6 +40,8 @@ Expect updates soon, and feel free to share feedback or report issues to help im
 
 ## Features
 
+![screenshot-doc.png](docs/screenshot-doc.png)
+
 ### 🛠️ Flexible Client Management
 
 Create reusable HTTP clients to save and manage configurations, or make ad-hoc requests without a client.
@@ -63,8 +65,8 @@ Designed for ultimate flexibility, making it adaptable to any HTTP use case.
 ### 🔐 Auth
 
 - Bearer Token ✅
-- Basic Auth (_coming soon_...)
-- Digest Auth (_coming soon_...)
+- Basic Auth ✅
+- Digest Auth ✅
 
 ### 🚀 Built with `urllib`
 
