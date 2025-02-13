@@ -20,6 +20,7 @@ export default function (
   const { throwErrorOnError, splitBooleanOutputs: nodeSplitBooleanOutputs } = config;
 
   this.on('input', async (msg) => {
+    this.status({});
     const {
       resolvedRequestHeaders,
       resolvedRequestQueryParams,
