@@ -2,7 +2,9 @@ import type { NodeControllerConfig, NodeControllerInst } from '@keload/node-red-
 
 import type { NodeHappyConfigProps } from '../../common/nodeTypes';
 
-export const credentials = {};
+export const credentials = {
+  requestAuthPasswordSecret: { type: 'text' },
+};
 
 export default function (
   this: NodeControllerInst<NodeHappyConfigProps>,
@@ -27,6 +29,4 @@ export default function (
   this.requestAuthKind = config.requestAuthKind;
   this.requestAuthUsername = config.requestAuthUsername;
   this.requestAuthUsernameType = config.requestAuthUsernameType;
-  this.requestAuthPassword = config.requestAuthPassword;
-  this.requestAuthPasswordType = config.requestAuthPasswordType;
 }

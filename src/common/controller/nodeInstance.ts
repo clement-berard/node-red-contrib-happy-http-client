@@ -3,16 +3,18 @@ import type { Node, NodeMessage } from 'node-red';
 import type { HttpMethod } from 'urllib';
 import { CONSTANTS } from '../constants';
 import { HTTP_METHODS } from '../httpClient';
-import type { NodeHappyRequestProps } from '../nodeTypes';
+import type { NodeHappyRequestAllProps } from '../nodeTypes';
 
 const checkIsFromClient = (term: string) => term === CONSTANTS.INHERIT_CLIENT_TERM;
 
 export async function getComputedNodeInstance(params: {
   node: Node;
   msg: NodeMessage;
-  currentNode: NodeHappyRequestProps;
+  currentNode: NodeHappyRequestAllProps;
 }) {
   const { node, msg, currentNode } = params;
+
+  console.log('currentNode', currentNode);
 
   const { quickNodePropertyEval } = useControllerNode(node, msg);
 
@@ -30,7 +32,6 @@ export async function getComputedNodeInstance(params: {
     requestAuthBearerToken: checkIsFromClient(currentNode?.requestAuthBearerTokenType),
     requestAuthKind: checkIsFromClient(currentNode?.requestAuthKind),
     requestAuthUsername: checkIsFromClient(currentNode?.requestAuthUsernameType),
-    requestAuthPassword: checkIsFromClient(currentNode?.requestAuthPasswordType),
   };
 
   return {
@@ -40,5 +41,6 @@ export async function getComputedNodeInstance(params: {
     resolvedNodeEndpoint,
     isFromClient,
     currentNodeInstance: currentNode,
+    credentials: currentNode.credentials,
   };
 }

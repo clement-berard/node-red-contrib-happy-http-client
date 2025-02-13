@@ -17,13 +17,17 @@ export interface CommonNodeFields {
   requestAuthKind: string;
   requestAuthUsername: string;
   requestAuthUsernameType: string;
-  requestAuthPassword: string;
-  requestAuthPasswordType: string;
 }
 
 export interface NodeHappyConfigProps extends CommonNodeFields {
   baseUrl: string;
 }
+
+export interface NodeHappyConfigCredentials {
+  requestAuthPasswordSecret: string;
+}
+
+export type NodeHappyConfigAllProps = NodeHappyConfigProps & { credentials: NodeHappyConfigCredentials };
 
 export interface NodeHappyRequestProps extends CommonNodeFields {
   clientInstance: string;
@@ -39,3 +43,9 @@ export interface NodeHappyRequestProps extends CommonNodeFields {
   outputs: number;
   responseFormat: RequestOptions['dataType'];
 }
+
+export interface NodeHappyRequestPropsCredentials {
+  requestAuthPasswordSecret: string;
+}
+
+export type NodeHappyRequestAllProps = NodeHappyRequestProps & { credentials: NodeHappyRequestPropsCredentials };
