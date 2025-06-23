@@ -1,16 +1,16 @@
 import axios from 'axios';
 import basicAuth from 'basic-auth';
 import express, { type Request, type Response, type NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 
 const app = express();
 const PORT = 3002;
-const BEARER_SECRET = 'your-secret-key'; // Change this secret to a secure one
+// const BEARER_SECRET = 'your-secret-key'; // Change this secret to a secure one
 
 // Middleware for Basic Auth
 const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const user = basicAuth(req);
-  const authHeader = req.headers['authorization'];
+  const authHeader = req.headers.authorization;
 
   if (user && user.name === 'admin' && user.pass === 'password') {
     // Change username and password
@@ -22,9 +22,9 @@ const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction) =>
 
 // Middleware for Bearer Token Auth
 const bearerAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers['authorization'];
+  const authHeader = req.headers.authorization;
   console.log('authHeader', authHeader);
-  if (authHeader && authHeader.startsWith('Bearer ')) {
+  if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     console.log('token', token);
     try {
