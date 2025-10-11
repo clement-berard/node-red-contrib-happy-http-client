@@ -1,4 +1,4 @@
-import { type NodeEditorProps, createEditorNode } from '@keload/node-red-dxp/editor';
+import { createEditorNode, type NodeEditorProps } from '@keload/node-red-dxp/editor';
 import { initTabs } from '@keload/node-red-dxp/editor/dom-helper';
 
 import { applyTypedField, getCommonDefaultFields, initAuthFields } from '../../../common/editor/commonNodeEditor';
@@ -21,7 +21,6 @@ const HappyConfig = createEditorNode<NodeEditorProps<NodeHappyConfigProps>, Node
     return this.name || 'HappyConfig';
   },
   oneditprepare: function () {
-    // biome-ignore lint/complexity/noForEach: <explanation>
     ['defaultArgsHeaders', 'defaultArgsQueryParams'].forEach((selector) => {
       applyTypedField({
         valueType: 'json',
