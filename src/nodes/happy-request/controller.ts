@@ -100,7 +100,6 @@ export default function (
 
     const msgResponse = {
       ...msg,
-      // @ts-ignore
       happyRequest: res,
       payload: data,
     };

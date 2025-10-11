@@ -1,9 +1,13 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
-	"organizeImports": { "enabled": true },
+	"$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"files": {
-		"include": ["src/**/*.ts", "src/**/*.json", "tests/**/*.ts"],
-		"ignore": ["**/dist"]
+		"includes": [
+			"**/src/**/*.ts",
+			"**/src/**/*.json",
+			"**/tests/**/*.ts",
+			"!**/dist"
+		]
 	},
 	"javascript": {
 		"formatter": {

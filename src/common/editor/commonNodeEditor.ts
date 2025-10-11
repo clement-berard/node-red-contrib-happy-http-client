@@ -71,7 +71,6 @@ export function applyTypedField(params: ApplyTypedField) {
   }
   if (withInherit) {
     const _label = `Inherit from client ${withInheritLabel ? ` or ${withInheritLabel}` : ''}`;
-    // @ts-ignore
     innerTypes.push({
       value: CONSTANTS.INHERIT_CLIENT_TERM,
       label: _label,
@@ -83,13 +82,12 @@ export function applyTypedField(params: ApplyTypedField) {
     innerTypes.push(...COMMON_INPUT_TYPED_TYPES);
   }
   const wd = jqSelector(selector).typedInput({
-    // @ts-ignore
     types: innerTypes.filter(Boolean),
     typeField: resolveSelector(`${selector}${typedFieldSuffix}`),
   });
 
   if (defaultValue !== undefined) {
-    // @ts-ignore
+    // @ts-expect-error
     wd.typedInput('value', defaultValue);
   }
 }

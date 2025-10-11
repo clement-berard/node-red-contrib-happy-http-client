@@ -1,4 +1,4 @@
-import { type NodeEditorProps, createEditorNode } from '@keload/node-red-dxp/editor';
+import { createEditorNode, type NodeEditorProps } from '@keload/node-red-dxp/editor';
 import { initSelect, initTabs, isCheckboxChecked } from '@keload/node-red-dxp/editor/dom-helper';
 
 import { applyTypedField, getCommonDefaultFields, initAuthFields } from '../../../common/editor/commonNodeEditor';
@@ -55,7 +55,6 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>, No
       withInherit: false,
     });
 
-    // biome-ignore lint/complexity/noForEach: <explanation>
     ['defaultArgsHeaders', 'defaultArgsQueryParams', 'body'].forEach((i) => {
       applyTypedField({
         valueType: 'json',

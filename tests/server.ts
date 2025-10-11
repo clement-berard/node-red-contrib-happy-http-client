@@ -1,6 +1,7 @@
 import axios from 'axios';
 import basicAuth from 'basic-auth';
-import express, { type Request, type Response, type NextFunction } from 'express';
+import express, { type NextFunction, type Request, type Response } from 'express';
+
 // import jwt from 'jsonwebtoken';
 
 const app = express();
@@ -10,7 +11,7 @@ const PORT = 3002;
 // Middleware for Basic Auth
 const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const user = basicAuth(req);
-  const authHeader = req.headers.authorization;
+  const _authHeader = req.headers.authorization;
 
   if (user && user.name === 'admin' && user.pass === 'password') {
     // Change username and password
@@ -30,7 +31,7 @@ const bearerAuthMiddleware = (req: Request, res: Response, next: NextFunction) =
     try {
       // jwt.verify(token, BEARER_SECRET);
       if (token === 'tonton') return next();
-    } catch (err) {
+    } catch (_err) {
       return res.status(403).send('Invalid token.');
     }
   }
@@ -47,18 +48,18 @@ app.get('/proxy', async (req: Request, res: Response) => {
   try {
     const response = await axios.get(url);
     res.status(response.status).send(response.data);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).send('Failed to fetch data from the external API.');
   }
 });
 
 // Protected route with Basic Auth
-app.get('/protected-basic', basicAuthMiddleware, (req: Request, res: Response) => {
+app.get('/protected-basic', basicAuthMiddleware, (_req: Request, res: Response) => {
   res.send('This is a protected route using Basic Auth.');
 });
 
 // Protected route with Bearer Token
-app.get('/protected-bearer', bearerAuthMiddleware, (req: Request, res: Response) => {
+app.get('/protected-bearer', bearerAuthMiddleware, (_req: Request, res: Response) => {
   res.json({ ok: 'This is a protected route using Bearer Token Auth.' });
 });
 

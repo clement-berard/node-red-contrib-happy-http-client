@@ -1,12 +1,11 @@
+import { useControllerNode } from '@keload/node-red-dxp/utils/controller';
 import type { Node, NodeMessage } from 'node-red';
 import { assign, isEmpty } from 'radash';
+import { DEFAULT_VALUES } from '../defaultValues';
 import { resolveUrlWithBase } from '../httpClient';
 import type { CommonNodeFields, NodeHappyConfigAllProps, NodeHappyRequestAllProps } from '../nodeTypes';
-import { getComputedNodeInstance } from './nodeInstance';
-
-import { useControllerNode } from '@keload/node-red-dxp/utils/controller';
-import { DEFAULT_VALUES } from '../defaultValues';
 import { getComputedClientInstance } from './configInstance';
+import { getComputedNodeInstance } from './nodeInstance';
 
 type ResolveRequestInformationParams = {
   node: Node;
