@@ -15,7 +15,9 @@
     "lint": "pnpm biome lint",
     "lint:check": "pnpm biome check",
     "release": "pnpm release-it",
-    "release:test": "pnpm release-it --dry-run"
+    "release:test": "pnpm release-it --dry-run",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "node-red": {
     "version": ">=2.0.0",
@@ -38,7 +40,8 @@
     "radash": "12.1.1",
     "release-it": "19.0.5",
     "tsx": "4.20.6",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^3.2.4"
   },
   "keywords": [
     "node-red",
