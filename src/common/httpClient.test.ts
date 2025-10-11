@@ -1,10 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
 import type { HttpClient } from 'urllib';
+import { describe, expect, it, vi } from 'vitest';
 import {
   HTTP_METHODS,
+  handleRequest,
   REQUEST_BODY_CONTENT_TYPES,
   REQUEST_RESPONSE_FORMAT,
-  handleRequest,
   resolveUrlWithBase,
 } from './httpClient';
 
