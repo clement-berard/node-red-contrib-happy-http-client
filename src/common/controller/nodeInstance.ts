@@ -14,8 +14,6 @@ export async function getComputedNodeInstance(params: {
 }) {
   const { node, msg, currentNode } = params;
 
-  console.log('currentNode', currentNode);
-
   const { quickNodePropertyEval } = useControllerNode(node, msg);
 
   const resolvedNodeEndpoint = await quickNodePropertyEval(currentNode, 'endpoint');
