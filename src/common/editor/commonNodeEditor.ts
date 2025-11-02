@@ -24,6 +24,8 @@ export function getCommonDefaultFields(params: GetCommonDefaultFields = {}): Rec
     connectionTimeoutType: { ...fromClientOr('num') },
     caRejectUnauthorized: { value: DEFAULT_VALUES.CONNECTION_TIMEOUT, type: 'bool' },
     caRejectUnauthorizedType: { ...fromClientOr('bool') },
+    urlProxy: { value: '', type: 'str' },
+    urlProxyType: { ...fromClientOr('str') },
     requestAuthBearerToken: { value: '', type: 'str' },
     requestAuthBearerTokenType: { ...fromClientOr('str') },
     requestAuthKind: { value: '', type: 'str' },

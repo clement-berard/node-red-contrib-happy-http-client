@@ -87,6 +87,13 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>, No
     });
 
     applyTypedField({
+      valueType: 'str',
+      selector: '$urlProxy',
+      withInheritLabel: 'none',
+      withInherit: true,
+    });
+
+    applyTypedField({
       valueType: 'num',
       selector: '$connectionKeepAlive',
       withInheritLabel: '4000ms',

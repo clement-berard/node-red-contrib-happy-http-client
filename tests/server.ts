@@ -41,6 +41,7 @@ const bearerAuthMiddleware = (req: Request, res: Response, next: NextFunction) =
 // Public route used as a proxy
 app.get('/proxy', async (req: Request, res: Response) => {
   const { url } = req.query;
+  console.log('REEEE', req);
   if (!url || typeof url !== 'string') {
     return res.status(400).send('Missing or invalid URL parameter.');
   }
@@ -61,6 +62,11 @@ app.get('/protected-basic', basicAuthMiddleware, (_req: Request, res: Response) 
 // Protected route with Bearer Token
 app.get('/protected-bearer', bearerAuthMiddleware, (_req: Request, res: Response) => {
   res.json({ ok: 'This is a protected route using Bearer Token Auth.' });
+});
+
+app.get('/', bearerAuthMiddleware, (req: Request, res: Response) => {
+  const { url } = req.query;
+  console.log('REEEE', req, url);
 });
 
 // Start the server

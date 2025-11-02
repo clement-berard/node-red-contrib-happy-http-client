@@ -37,7 +37,8 @@ mixin requestAdvancedFields(isConfig)
     +dxpFormRowInputTextTyped('caRejectUnauthorized', 'Reject', '', 'Reject Unauthorized', isConfig)
         +dxpHint Verify server certificate
     +dxpFormTitleSeparator('Proxy')
-    +pkgComingSoon
+    +dxpFormRowInputTextTyped('urlProxy', 'Proxy URL', 'globe', 'Proxy URL', isConfig)
+        +dxpHint Request through a http proxy
 
 mixin requestAuthFields(isConfig)
     +dxpFormRowSelect('requestAuthKind', 'Type', '', isConfig)

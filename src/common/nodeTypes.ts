@@ -12,6 +12,8 @@ export interface CommonNodeFields {
   connectionTimeoutType: string;
   caRejectUnauthorized: boolean;
   caRejectUnauthorizedType: string;
+  urlProxy: string;
+  urlProxyType: string;
   requestAuthBearerToken: string;
   requestAuthBearerTokenType: string;
   requestAuthKind: string;

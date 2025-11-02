@@ -1,7 +1,7 @@
 import type { NodeControllerConfig, NodeControllerInst } from '@keload/node-red-dxp/editor';
 import { isUrl } from '@keload/node-red-dxp/utils';
 import { getREDNode, splitBooleanOutputs } from '@keload/node-red-dxp/utils/controller';
-import { HttpClient } from 'urllib';
+import { HttpClient, ProxyAgent } from 'urllib';
 import { resolveRequestInformation } from '../../common/controller/reqInfo';
 import { handleRequest } from '../../common/httpClient';
 import type { NodeHappyConfigAllProps, NodeHappyRequestAllProps } from '../../common/nodeTypes';
@@ -36,6 +36,7 @@ export default function (
       resolvedCaRejectUnauthorized,
       urlToFetch,
       resolvedRequestAuth,
+      resolvedRequestUrlProxy,
     } = await resolveRequestInformation({
       node: this,
       msg,
@@ -45,9 +46,17 @@ export default function (
 
     const dateNow = new Date().toLocaleString();
 
-    const isValidUrl = isUrl(urlToFetch);
+    if (resolvedRequestUrlProxy && !isUrl(resolvedRequestUrlProxy)) {
+      this.error(`Invalid Proxy URL: ${resolvedRequestUrlProxy}`);
+      this.status({
+        fill: 'red',
+        text: `Invalid Proxy URL at ${dateNow}`,
+      });
 
-    if (!isValidUrl) {
+      return;
+    }
+
+    if (!isUrl(urlToFetch)) {
       this.error(`Invalid URL: ${urlToFetch}`);
       this.status({
         fill: 'red',
@@ -65,6 +74,8 @@ export default function (
       },
     });
 
+    console.log('resolvedRequestUrlProxy', resolvedRequestUrlProxy);
+
     const [err, data, res] = await handleRequest({
       url: urlToFetch,
       client: currentHttpClient,
@@ -75,6 +86,9 @@ export default function (
         ...(resolvedRequestMethod !== 'GET' && {
           data: resolvedRequestBody,
           contentType: resolvedRequestBodyContentType,
+        }),
+        ...(resolvedRequestUrlProxy && {
+          dispatcher: new ProxyAgent(resolvedRequestUrlProxy),
         }),
         dataType: config.responseFormat,
         keepAliveTimeout: Number(resolvedConnectionKeepAlive),
