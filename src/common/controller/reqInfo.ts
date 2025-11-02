@@ -89,6 +89,11 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     withInherit: isFromClient.requestAuthBearerToken,
   });
 
+  const [, , resolvedRequestUrlProxy] = await resolveEachNodes('urlProxy', {
+    defaultValue: '',
+    withInherit: isFromClient.urlProxy,
+  });
+
   const [clientInstanceRequestAuthKind, nodeInstanceRequestAuthKind] = await resolveEachNodes('requestAuthKind', {
     defaultValue: '',
   });
@@ -139,6 +144,7 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     resolvedConnectionKeepAlive,
     resolvedCaRejectUnauthorized,
     resolvedRequestAuthBearerToken,
+    resolvedRequestUrlProxy: resolvedRequestUrlProxy as string | undefined,
     resolvedRequestAuth: {
       hasAuth: hasAuthKind,
       authKind: realAuthKind as 'basic' | 'digest',

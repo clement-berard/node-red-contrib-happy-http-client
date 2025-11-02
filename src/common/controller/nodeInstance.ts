@@ -28,6 +28,7 @@ export async function getComputedNodeInstance(params: {
     connectionTimeout: checkIsFromClient(currentNode?.connectionTimeoutType),
     caRejectUnauthorized: checkIsFromClient(currentNode?.caRejectUnauthorizedType),
     requestAuthBearerToken: checkIsFromClient(currentNode?.requestAuthBearerTokenType),
+    urlProxy: checkIsFromClient(currentNode?.urlProxyType),
     requestAuthKind: checkIsFromClient(currentNode?.requestAuthKind),
     requestAuthUsername: checkIsFromClient(currentNode?.requestAuthUsernameType),
   };

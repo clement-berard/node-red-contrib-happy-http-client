@@ -42,6 +42,12 @@ const HappyConfig = createEditorNode<NodeEditorProps<NodeHappyConfigProps>, Node
     });
 
     applyTypedField({
+      valueType: 'str',
+      selector: '$$urlProxy',
+      withInherit: false,
+    });
+
+    applyTypedField({
       valueType: 'num',
       selector: '$$connectionTimeout',
       withInherit: false,
