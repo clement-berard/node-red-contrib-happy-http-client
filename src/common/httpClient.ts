@@ -1,4 +1,3 @@
-import { isEmpty } from 'radash';
 import type { HttpClient, HttpMethod, RequestOptions } from 'urllib';
 
 export const HTTP_METHODS: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
@@ -31,9 +30,17 @@ type HandleRequestParams = {
 };
 
 export async function handleRequest(params: HandleRequestParams) {
-  const urlSearchParamsString = new URLSearchParams(params?.queryParams || {}).toString();
+  const structuredUrl = new URL(params.url);
 
-  const fullUrl = `${params.url}${!isEmpty(urlSearchParamsString) ? `?${urlSearchParamsString}` : ''}`;
+  const combinedSearchParams = new URLSearchParams({
+    ...Object.fromEntries(structuredUrl.searchParams),
+    ...params?.queryParams,
+  });
+
+  structuredUrl.search = combinedSearchParams.toString();
+
+  const fullUrl = structuredUrl.toString();
+
   const reqOptions = params?.reqOptions || {};
 
   try {
