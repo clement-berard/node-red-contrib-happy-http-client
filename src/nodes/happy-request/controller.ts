@@ -43,13 +43,15 @@ export default function (
       clientInstance,
     });
 
+    const dateNow = new Date().toLocaleString();
+
     const isValidUrl = isUrl(urlToFetch);
 
     if (!isValidUrl) {
       this.error(`Invalid URL: ${urlToFetch}`);
       this.status({
         fill: 'red',
-        text: 'Invalid URL',
+        text: `Invalid URL at ${dateNow}`,
       });
 
       return;
@@ -94,7 +96,7 @@ export default function (
       });
       this.status({
         fill: 'red',
-        text: 'error',
+        text: `Error ${res.response.status} at ${dateNow}`,
       });
     }
 
@@ -103,6 +105,13 @@ export default function (
       happyRequest: res,
       payload: data,
     };
+
+    if (res.ok) {
+      this.status({
+        fill: 'green',
+        text: `Success at ${dateNow}`,
+      });
+    }
 
     if (nodeSplitBooleanOutputs) {
       const isSuccess = err === undefined;
