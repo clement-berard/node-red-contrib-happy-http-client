@@ -104,12 +104,13 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
   });
 
   const resolvedRequestAuthPasswordSecret = () => {
-    if (nodeInstance.credentials.requestAuthPasswordSecret) {
+    if (nodeInstance?.credentials?.requestAuthPasswordSecret) {
       return nodeInstance.credentials.requestAuthPasswordSecret;
     }
-    if (configInstance.credentials.requestAuthPasswordSecret) {
+    if (configInstance?.credentials?.requestAuthPasswordSecret) {
       return configInstance.credentials.requestAuthPasswordSecret;
     }
+
     return '';
   };
 
