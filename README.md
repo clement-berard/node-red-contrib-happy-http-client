@@ -58,7 +58,11 @@ Choose whether the node should throw errors or not. Separate outputs for success
 
 Designed for ultimate flexibility, making it adaptable to any HTTP use case.
 
-### ⏩︎ TLS / Proxy
+### 🔑 TLS
+
+Verify server certificate or not (`rejectUnauthorized`)
+
+### ⏩︎ Proxy
 
 - _coming soon_...
 
