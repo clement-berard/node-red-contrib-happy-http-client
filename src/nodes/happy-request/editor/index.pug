@@ -1,32 +1,37 @@
-include ../../../../.node-red-dxp/pug-helper
+include ../../../../.node-red-dxp/pug/helper
 include ../../../common/editor/commonFields
 
-+pkgBetaWarning
-+dxpFormRowInputText('name', 'name', 'tag', 'name')
-+dxpFormRowSelectConfigNode('clientInstance', 'Client', 'server')
-    +dxpHint
-        | Client is not required
-+dxpFormRowInputTextTyped('endpoint', 'Endpoint', 'globe')
-    +dxpHint
-        | Endpoint or full URL without client
-+dxpFormRowInputTextTyped('method', 'Method', 'envelope-o')
++dxpFormRowInputText({ id: 'name', label: 'Name', icon: 'tag' })
++dxpFormRowSelectConfigNode({ id: 'clientInstance', label: 'Client', icon: 'server' })
+    +dxpHint Client is not required
++dxpFormRowInputText({ id: 'endpoint', label: 'Endpoint', icons: 'globe', isTyped: true })
+    +dxpHint Endpoint or full URL without client
++dxpFormRowInputText({ id: 'method', label: 'Method', icons: 'envelope-o', isTyped: true })
 +dxpTabs('tabs-request-node')
     #tab-request.hidden
-        +commonRequestFields(false)
-        +dxpFormRowInputTextTyped('body', 'Body', 'align-left', 'Body')
-        +dxpFormRowSelect('bodyContentType', 'Body Type', 'file-code-o ')
-            +dxpHint
-                | Body content type
-        +requestFieldsKeepAlive(false)
-        +requestFieldsConnectionTimeout(false)
+        +commonRequestFields({isConfig: false})
+        +dxpFormRowInputText({ id: 'body', label: 'Body', icons: 'align-left', placeholder: 'Body', isTyped: true })
+        +dxpFormRowSelect({ id: "bodyContentType", label: "Body Type", icon: 'file-code-o' })
+            +dxpHint Body content type
+        +requestFieldsKeepAlive({isConfig: false})
+        +requestFieldsConnectionTimeout({isConfig: false})
     #tab-response.hidden
-        +dxpFormRowCheckbox('throwErrorOnError', 'Throw Error', 'exclamation-circle', 'Throw error if HTTP response status code other than 2xx')(checked)
-        +dxpFormRowSelect('responseFormat', 'Format', 'share-square-o')
-            +dxpHint
-                | Response format
+        +dxpFormRowCheckbox({
+            id: "throwErrorOnError",
+            label: "Throw Error",
+            icon: 'exclamation-circle',
+            text: 'Throw error if HTTP response status code other than 2xx'
+        })(checked)
+        +dxpFormRowSelect({ id: "responseFormat", label: "Format", icon: 'share-square-o' })
+            +dxpHint Response format
         +dxpFormTitleSeparator('Node outputs')
-        +dxpFormRowCheckbox('splitBooleanOutputs', 'Split out', 'map-signs', 'Split in two distinct outputs success/error')
+        +dxpFormRowCheckbox({
+            id: "splitBooleanOutputs",
+            label: "Split out",
+            icon: 'map-signs',
+            text: 'Split in two distinct outputs success/error'
+        })
     #tab-auth.hidden
-        +requestAuthFields
+        +requestAuthFields({isConfig: false})
     #tab-advanced.hidden
-        +requestAdvancedFields(false)
+        +requestAdvancedFields({isConfig: false})

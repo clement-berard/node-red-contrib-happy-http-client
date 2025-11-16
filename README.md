@@ -62,10 +62,6 @@ Designed for ultimate flexibility, making it adaptable to any HTTP use case.
 
 Verify server certificate or not (`rejectUnauthorized`)
 
-### ⏩︎ Proxy
-
-- _coming soon_...
-
 ### 🔐 Auth
 
 - Bearer Token ✅

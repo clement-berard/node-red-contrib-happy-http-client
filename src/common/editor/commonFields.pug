@@ -1,3 +1,5 @@
+include ../../../.node-red-dxp/pug/helper
+
 mixin pkgBetaWarning
     .alert.alert-info
         | Node is in Beta state.
@@ -6,43 +8,85 @@ mixin pkgComingSoon
     .alert.alert-info.italic
         | Coming soon...
 
-mixin commonRequestFields(isConfig)
-    +dxpFormRowInputTextTyped('defaultArgsHeaders', 'Headers', 'table', 'Headers', isConfig)
+mixin commonRequestFields(params)
+    +dxpFormRowInputText({
+        id: 'defaultArgsHeaders',
+        label: 'Headers',
+        icon: 'table',
+        isTyped: true,
+        placeholder: 'Headers',
+        isConfig: params.isConfig
+    })
         +dxpHint
-            if isConfig
+            if params.isConfig
                 | Defaults request headers
             else
                 | Request headers (merge and override client)
             |  (json)
-    +dxpFormRowInputTextTyped('defaultArgsQueryParams', 'Params', 'table', 'Params', isConfig)
+    +dxpFormRowInputText({
+        id: 'defaultArgsQueryParams',
+        label: 'Params',
+        icon: 'table',
+        isTyped: true,
+        placeholder: 'Params',
+        isConfig: params.isConfig
+    })
         +dxpHint
-            if isConfig
+            if params.isConfig
                 | Defaults request query params
             else
                 | Request query params (merge and override client)
             |  (json)
 
-mixin requestFieldsKeepAlive(isConfig)
-    +dxpFormRowInputTextTyped('connectionKeepAlive', 'Keep-Alive', '', '' , isConfig)
-        +dxpHint
-            |  Must be a number in ms (0 is off)
+mixin requestFieldsKeepAlive(params)
+    +dxpFormRowInputText({
+        id: 'connectionKeepAlive',
+        label: 'Keep-Alive',
+        isTyped: true,
+        isConfig: params.isConfig
+    })
+        +dxpHint Must be a number in ms (0 is off)
 
-mixin requestFieldsConnectionTimeout(isConfig)
-    +dxpFormRowInputTextTyped('connectionTimeout', 'Timeout', 'clock-o', 'Timeout', isConfig)
-        +dxpHint
-            |  Must be a number in ms
+mixin requestFieldsConnectionTimeout(params)
+    +dxpFormRowInputText({
+        id: 'connectionTimeout',
+        label: 'Timeout',
+        icons: 'clock-o',
+        placeholder: 'Timeout',
+        isTyped: true,
+        isConfig: params.isConfig
+    })
+        +dxpHint Must be a number in ms
 
-mixin requestAdvancedFields(isConfig)
+mixin requestAdvancedFields(params)
+    - var params = params ?? {}
     +dxpFormTitleSeparator('TLS')
-    +dxpFormRowInputTextTyped('caRejectUnauthorized', 'Reject', '', 'Reject Unauthorized', isConfig)
+    +dxpFormRowInputText({
+        id: 'caRejectUnauthorized',
+        label: 'Reject',
+        placeholder: 'Reject Unauthorized',
+        isTyped: true,
+        isConfig: params.isConfig
+    })
         +dxpHint Verify server certificate
-    +dxpFormTitleSeparator('Proxy')
-    +pkgComingSoon
 
-mixin requestAuthFields(isConfig)
-    +dxpFormRowSelect('requestAuthKind', 'Type', '', isConfig)
+mixin requestAuthFields(params)
+    - var params = params ?? {}
+    +dxpFormRowSelect({ id: "requestAuthKind", label: "Type", isConfig: params.isConfig })
     div.auth-cred-container.hidden
-        +dxpFormRowInputTextTyped('requestAuthUsername', 'Username', 'user', '', isConfig)
-        +dxpFormRowInputText('requestAuthPasswordSecret', 'Password', 'lock', '', isConfig)(type="password")
+        +dxpFormRowInputText({
+            id: 'requestAuthUsername',
+            label: 'Username',
+            icons: 'user',
+            isTyped: true,
+            isConfig: params.isConfig
+        })
+        +dxpFormRowInputText({ id: 'requestAuthPasswordSecret', label: 'Password', icon: 'lock', isConfig: params.isConfig })(type="password")
     +dxpFormTitleSeparator('Bearer Token')
-    +dxpFormRowInputTextTyped('requestAuthBearerToken', 'Bearer Token', '', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', isConfig)
+    +dxpFormRowInputText({
+        id: 'requestAuthBearerToken',
+        label: 'Bearer Token',
+        placeholder: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        isTyped: true,
+        isConfig: params.isConfig
+    })
