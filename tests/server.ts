@@ -1,4 +1,3 @@
-import axios from 'axios';
 import basicAuth from 'basic-auth';
 import express, { type NextFunction, type Request, type Response } from 'express';
 
@@ -46,8 +45,9 @@ app.get('/proxy', async (req: Request, res: Response) => {
   }
 
   try {
-    const response = await axios.get(url);
-    res.status(response.status).send(response.data);
+    const response = await fetch(url);
+    const data = await response.text();
+    res.status(response.status).send(data);
   } catch (_error) {
     res.status(500).send('Failed to fetch data from the external API.');
   }

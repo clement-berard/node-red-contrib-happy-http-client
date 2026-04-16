@@ -16,12 +16,18 @@ export async function getComputedNodeInstance(params: {
 
   const { quickNodePropertyEval } = useControllerNode(node, msg);
 
-  const resolvedNodeEndpoint = await quickNodePropertyEval(currentNode, 'endpoint');
-  const nodeInstanceBody = await quickNodePropertyEval(currentNode, 'body');
-  const nodeInstanceBodyContentType = await quickNodePropertyEval(currentNode, 'bodyContentType');
+  const [resolvedNodeEndpoint, nodeInstanceBody, nodeInstanceBodyContentType, evaluatedMethod] = await Promise.all([
+    quickNodePropertyEval(currentNode, 'endpoint'),
+    quickNodePropertyEval(currentNode, 'body'),
+    quickNodePropertyEval(currentNode, 'bodyContentType'),
+    HTTP_METHODS.includes(currentNode.methodType)
+      ? Promise.resolve(currentNode.methodType)
+      : quickNodePropertyEval(currentNode, 'method'),
+  ]);
+
   const nodeInstanceMethod: HttpMethod = HTTP_METHODS.includes(currentNode.methodType)
     ? currentNode.methodType
-    : await quickNodePropertyEval(currentNode, 'method');
+    : (evaluatedMethod as HttpMethod);
 
   const isFromClient = {
     connectionKeepAlive: checkIsFromClient(currentNode?.connectionKeepAliveType),
