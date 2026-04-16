@@ -16,6 +16,7 @@ jobs:
   # Build job
   static-checks:
     runs-on: ubuntu-latest
+    container: node:24
     steps:
       - name: Checkout
         uses: actions/checkout@v4
