@@ -13,33 +13,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Build job
   static-checks:
     runs-on: ubuntu-latest
-    container: node:24
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v5
-        name: Install pnpm
+
+      - uses: actions/setup-node@v6
         with:
-          version: 10
-          run_install: true
+          node-version: 24
+          cache: 'pnpm'
 
-#      - name: Setup Node
-#        uses: actions/setup-node@v6
-#        with:
-#          node-version: 24
-#          cache: pnpm
-
-      - name: Lint
-        run: pnpm biome ci
-
-      - name: Unit Tests
-        run: pnpm test
-
-      - name: Build
-        run: pnpm build
+      - run: pnpm install
+      - run: pnpm biome ci
+      - run: pnpm test
+      - run: pnpm build
