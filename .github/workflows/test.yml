@@ -31,11 +31,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
       - name: Lint
-        run: pnpm lint:check
+        run: pnpm biome ci
 
       - name: Unit Tests
         run: pnpm test

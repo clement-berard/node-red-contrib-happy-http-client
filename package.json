@@ -3,7 +3,7 @@
   "version": "1.6.0",
   "description": "Fresh way to manage HTTP requests",
   "engines": {
-    "node": ">=18"
+    "node": ">=24"
   },
   "publishConfig": {
     "access": "public"
@@ -11,13 +11,9 @@
   "scripts": {
     "build": "pnpm node-red-dxp build",
     "dev": "pnpm node-red-dxp watch",
-    "format": "pnpm biome format",
-    "lint": "pnpm biome lint",
-    "lint:check": "pnpm biome check",
+    "lint": "pnpm biome check",
     "release": "pnpm release-it",
-    "release:test": "pnpm release-it --dry-run",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "vitest"
   },
   "node-red": {
     "version": ">=2.0.0",
