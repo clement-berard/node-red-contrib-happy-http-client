@@ -32,12 +32,6 @@ Create and manage clients, parameterize everything, and handle errors effortless
   </a>
 </p>
 
-
-## 🚧 Beta Version Notice
-
-Happy HTTP Client is currently in beta. While it already offers powerful features, some functionalities are still under development.
-Expect updates soon, and feel free to share feedback or report issues to help improve the node! 🚀✨
-
 ## Features
 
 ![screenshot-doc.png](docs/screenshot-doc.png)
