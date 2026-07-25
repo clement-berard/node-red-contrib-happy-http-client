@@ -1,8 +1,9 @@
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
+minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
-  - '@keload/node-red-dxp@1.34.0'
+  - '@keload/*'
 overrides:
   "@types/node": "24.x"
 updateConfig:
