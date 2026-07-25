@@ -12,7 +12,7 @@ type ResolveRequestInformationParams = {
   node: Node;
   msg: NodeMessage;
   currentNode: NodeHappyRequestAllProps;
-  clientInstance: NodeHappyConfigAllProps;
+  clientInstance: NodeHappyConfigAllProps | null;
 };
 
 export async function resolveRequestInformation(params: ResolveRequestInformationParams) {
@@ -61,13 +61,15 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     configInstance?.credentials?.requestAuthPasswordSecret ||
     '';
 
-  const requestHeaders = {
+  const resolvedRequestAuthBearerToken = results.requestAuthBearerToken.finalValue as string | undefined;
+
+  const requestHeaders: Record<string, string> = {
     ...assign(
-      (results.defaultArgsHeaders.clientVal as Record<string, unknown>) || {},
-      (results.defaultArgsHeaders.nodeVal as Record<string, unknown>) || {},
+      (results.defaultArgsHeaders.clientVal as Record<string, string>) || {},
+      (results.defaultArgsHeaders.nodeVal as Record<string, string>) || {},
     ),
-    ...(results.requestAuthBearerToken.finalValue && {
-      authorization: `Bearer ${results.requestAuthBearerToken.finalValue}`,
+    ...(resolvedRequestAuthBearerToken && {
+      authorization: `Bearer ${resolvedRequestAuthBearerToken}`,
     }),
   };
 
@@ -78,8 +80,8 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
   return {
     resolvedRequestHeaders: requestHeaders,
     resolvedRequestQueryParams: assign(
-      (results.defaultArgsQueryParams.clientVal as Record<string, unknown>) || {},
-      (results.defaultArgsQueryParams.nodeVal as Record<string, unknown>) || {},
+      (results.defaultArgsQueryParams.clientVal as Record<string, string>) || {},
+      (results.defaultArgsQueryParams.nodeVal as Record<string, string>) || {},
     ),
     resolvedRequestMethod: nodeInstance.nodeInstanceMethod,
     resolvedRequestBody: nodeInstance.nodeInstanceBody,
@@ -88,7 +90,7 @@ export async function resolveRequestInformation(params: ResolveRequestInformatio
     resolvedConnectionTimeout: results.connectionTimeout.finalValue,
     resolvedConnectionKeepAlive: results.connectionKeepAlive.finalValue,
     resolvedCaRejectUnauthorized: results.caRejectUnauthorized.finalValue,
-    resolvedRequestAuthBearerToken: results.requestAuthBearerToken.finalValue,
+    resolvedRequestAuthBearerToken,
     resolvedRequestAuth: {
       hasAuth: hasAuthKind,
       authKind: realAuthKind as 'basic' | 'digest',

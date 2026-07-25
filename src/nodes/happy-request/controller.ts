@@ -1,6 +1,7 @@
 import type { NodeControllerConfig, NodeControllerInst } from '@keload/node-red-dxp/editor';
 import { isUrl } from '@keload/node-red-dxp/utils';
 import { getREDNode, splitBooleanOutputs } from '@keload/node-red-dxp/utils/controller';
+import type { NodeMessage } from 'node-red';
 import { HttpClient } from 'urllib';
 import { resolveRequestInformation } from '../../common/controller/reqInfo';
 import { handleRequest } from '../../common/httpClient';
@@ -115,7 +116,7 @@ export default function (
 
     if (nodeSplitBooleanOutputs) {
       const isSuccess = err === undefined;
-      const outputs = splitBooleanOutputs(isSuccess, msgResponse);
+      const outputs = splitBooleanOutputs(isSuccess, msgResponse) as Array<NodeMessage | NodeMessage[] | null>;
       this.send(outputs);
     } else {
       this.send(msgResponse);
