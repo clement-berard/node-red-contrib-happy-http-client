@@ -16,14 +16,14 @@ export async function getComputedNodeInstance(params: {
 
   const { quickNodePropertyEval } = useControllerNode(node, msg);
 
-  const [resolvedNodeEndpoint, nodeInstanceBody, nodeInstanceBodyContentType, evaluatedMethod] = await Promise.all([
+  const [resolvedNodeEndpoint, nodeInstanceBody, nodeInstanceBodyContentType, evaluatedMethod] = (await Promise.all([
     quickNodePropertyEval(currentNode, 'endpoint'),
     quickNodePropertyEval(currentNode, 'body'),
     quickNodePropertyEval(currentNode, 'bodyContentType'),
     HTTP_METHODS.includes(currentNode.methodType)
       ? Promise.resolve(currentNode.methodType)
       : quickNodePropertyEval(currentNode, 'method'),
-  ]);
+  ])) as [string, unknown, string | undefined, unknown];
 
   const nodeInstanceMethod: HttpMethod = HTTP_METHODS.includes(currentNode.methodType)
     ? currentNode.methodType

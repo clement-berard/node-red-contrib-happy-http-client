@@ -1,4 +1,5 @@
 import { initSelect, jqSelector, resolveSelector, watchInput } from '@keload/node-red-dxp/editor/dom-helper';
+import type { EditorWidgetTypedInputType, EditorWidgetTypedInputTypeDefinition } from 'node-red';
 import { isEmpty, title } from 'radash';
 import { CONSTANTS } from '../constants';
 import { DEFAULT_VALUES } from '../defaultValues';
@@ -32,7 +33,7 @@ export function getCommonDefaultFields(params: GetCommonDefaultFields = {}): Rec
   };
 }
 
-export const COMMON_INPUT_TYPED_TYPES = ['jsonata', 'msg', 'flow', 'global', 'env'];
+export const COMMON_INPUT_TYPED_TYPES: EditorWidgetTypedInputType[] = ['jsonata', 'msg', 'flow', 'global', 'env'];
 
 type ApplyTypedField = {
   selector: string;
@@ -41,7 +42,7 @@ type ApplyTypedField = {
   withExtraTypes?: boolean;
   additionalTypesReadonly?: string[];
   defaultValue?: boolean | string | number;
-  valueType: 'number' | 'str' | 'bool' | string;
+  valueType: EditorWidgetTypedInputType;
   opt?: {
     typedFieldSuffix?: string;
   };
@@ -59,7 +60,7 @@ export function applyTypedField(params: ApplyTypedField) {
     opt = {},
   } = params;
   const { typedFieldSuffix = 'Type' } = opt;
-  const innerTypes = [];
+  const innerTypes: (EditorWidgetTypedInputType | EditorWidgetTypedInputTypeDefinition)[] = [];
   if (!isEmpty(additionalTypesReadonly)) {
     innerTypes.push(
       ...additionalTypesReadonly.map((method) => ({

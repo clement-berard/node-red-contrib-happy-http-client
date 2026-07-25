@@ -2,7 +2,7 @@ import type { Node, NodeMessage } from 'node-red';
 import type { NodeHappyConfigAllProps } from '../nodeTypes';
 
 export async function getComputedClientInstance(params: {
-  clientInstance: NodeHappyConfigAllProps;
+  clientInstance: NodeHappyConfigAllProps | null;
   node: Node;
   msg: NodeMessage;
 }) {
