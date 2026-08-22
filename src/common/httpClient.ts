@@ -1,7 +1,9 @@
 import type { HttpClient, HttpMethod, RequestOptions } from 'urllib';
 
 export const HTTP_METHODS: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
-export const REQUEST_RESPONSE_FORMAT: RequestOptions['dataType'][] = ['json', 'text', 'html', 'buffer', 'stream'];
+export const REQUEST_RESPONSE_FORMAT = ['json', 'text', 'html', 'buffer', 'stream'] as const satisfies NonNullable<
+  RequestOptions['dataType']
+>[];
 
 export const REQUEST_BODY_CONTENT_TYPES = [
   {

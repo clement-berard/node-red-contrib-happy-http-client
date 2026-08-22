@@ -32,6 +32,9 @@
           { "type": "test", "section": "✅ Tests", "hidden": false },
           { "type": "ci", "section": "🔧 Continuous Integration", "hidden": false }
         ]
+      },
+      "gitRawCommitsOpts": {
+        "ignore": "^chore\\(release\\):"
       }
     }
   }
