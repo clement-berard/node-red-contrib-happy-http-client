@@ -34,7 +34,7 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>, No
     if (this.outputs > 1) {
       return index === 0 ? 'Success' : 'Error';
     }
-    return null;
+    return undefined;
   },
   oneditsave: function () {
     this.outputs = isCheckboxChecked('$splitBooleanOutputs') ? 2 : 1;
