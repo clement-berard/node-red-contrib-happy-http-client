@@ -52,6 +52,20 @@ Choose whether the node should throw errors or not. Separate outputs for success
 
 Designed for ultimate flexibility, making it adaptable to any HTTP use case.
 
+### 🧩 Scripting: Before Request & Transform Response
+
+Add optional JavaScript directly in the node, with a full code editor (syntax highlighting, expandable to full screen) — the same editor Node-RED's core Function node uses.
+
+- **Before Request** (Request tab): runs just before the call is made. Receives `(request, msg, node)` and can mutate or return `{ url, method, headers, queryParams, body, bodyContentType }` to override the resolved request.
+- **Transform Response** (Response tab): runs after the response is built. Receives `(msg, node)` and must return the `msg` to send onward — reshape the payload, add fields, whatever you need.
+
+Both are optional — leave them empty and the node behaves exactly as before. Either one can return a `Promise`. If a script throws, the node reports an error and nothing is sent, so failures never pass silently.
+
+<p align="center">
+  <img src="docs/screenshot-scripting-request.png" width="45%" alt="Before Request scripting" />
+  <img src="docs/screenshot-scripting-response.png" width="45%" alt="Transform Response scripting" />
+</p>
+
 ### 🔑 TLS
 
 Verify server certificate or not (`rejectUnauthorized`)
