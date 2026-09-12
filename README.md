@@ -32,48 +32,81 @@ Create and manage clients, parameterize everything, and handle errors effortless
   </a>
 </p>
 
+## 📦 Installation
+
+```bash
+npm install @keload/node-red-contrib-happy-http-client
+```
+
+Or from the Node-RED editor: **Menu → Manage palette → Install**, then search for `@keload/node-red-contrib-happy-http-client`.
+
+## ⚡ Quick Start
+
+1. Drop a **Happy Config** node on the canvas (optional) and set a `Base URL`, e.g. `https://api.example.com/v1`.
+2. Drop a **Happy Request** node, pick that config as its `Client`, and set `Endpoint` to `/users/42`.
+3. Deploy and send it a message — the node makes the request and returns:
+
+```js
+msg.payload                        // response body
+msg.happyRequest.ok                // true for 2xx responses
+msg.happyRequest.response.status   // HTTP status code
+```
+
+No config node required — set a full URL directly as the `Endpoint` for one-off requests.
+
 ## Features
 
-![screenshot-doc.png](docs/screenshot-doc.png)
+### Flexible Client Management
 
-### 🛠️ Flexible Client Management
+Create reusable HTTP clients (`Happy Config` nodes) to store a base URL, default headers, auth, and timeouts once, then reuse them across as many `Happy Request` nodes as needed — or skip the client entirely for ad-hoc calls.
 
-Create reusable HTTP clients to save and manage configurations, or make ad-hoc requests without a client.
+![Client configuration](docs/screenshot-client.png)
 
-### 🌐 Full Parameterization
+### Full Parameterization
 
-All parameters (URL, headers, query params, body, etc.) are fully dynamic and can use msg, flow, global, environment variables...
+URL, headers, query params, and body all accept a static value, a `msg`/`flow`/`global` property, an environment variable, or a JSONata expression.
 
-### ⚠️ Advanced Error Handling
+![Typed input options](docs/screenshot-parameterization.png)
 
-Choose whether the node should throw errors or not. Separate outputs for success ✅ and error ❌ cases give you full control over your flow.
+### 🧩 Scripting: Before Request & Transform Response
 
-### 🎨 Customizable and Extensible
+Add optional JavaScript directly in the node, with a full code editor (syntax highlighting, expandable to full screen) — the same editor Node-RED's core Function node uses.
 
-Designed for ultimate flexibility, making it adaptable to any HTTP use case.
+- **Before Request** (Request tab): runs just before the call is made. Receives `(request, msg, node)` and can mutate or return `{ url, method, headers, queryParams, body, bodyContentType }` to override the resolved request.
+- **Transform Response** (Response tab): runs after the response is built. Receives `(msg, node)` and must return the `msg` to send onward — reshape the payload, add fields, whatever you need.
 
-### 🔑 TLS
+Both are optional — leave them empty and the node behaves exactly as before. Either one can return a `Promise`. If a script throws, the node reports an error and nothing is sent, so failures never pass silently.
 
-Verify server certificate or not (`rejectUnauthorized`)
+<p align="center">
+  <img src="docs/screenshot-scripting-request.png" width="45%" alt="Before Request scripting" />
+  <img src="docs/screenshot-scripting-response.png" width="45%" alt="Transform Response scripting" />
+</p>
 
-### 🔐 Auth
+### Authentication
 
-- Bearer Token ✅
-- Basic Auth ✅
-- Digest Auth ✅
+Basic, Bearer, or Digest — configure once on the client and inherit it everywhere, or override it per request.
 
-### 🚀 Built with `urllib`
+![Auth configuration](docs/screenshot-auth.png)
 
-Leverages the powerful [urllib](https://www.npmjs.com/package/urllib) library for reliability and performance.
+### Advanced Error Handling & Dual Outputs
+
+Choose whether the node throws on non-2xx responses, and optionally split successes and errors into two separate outputs for explicit branching in your flow.
+
+![Dual outputs](docs/screenshot-outputs.png)
+
+### TLS
+
+Toggle certificate verification (`rejectUnauthorized`) per client or per request.
+
+### Built with `urllib`
+
+Powered by [urllib](https://www.npmjs.com/package/urllib) for reliable, high-performance HTTP under the hood.
 
 ## Contributing & Developer Experience
-This package is built using [node-red-dxp](https://www.npmjs.com/package/@keload/node-red-dxp), offering a blazing-fast and seamless way to develop Node-RED packages. 
 
-Written in **TypeScript**, the codebase is cleanly structured, ensuring maintainability and effortless scalability.
+This package is built with [node-red-dxp](https://www.npmjs.com/package/@keload/node-red-dxp) and written in TypeScript, keeping the codebase structured and easy to extend.
 
-We’re committed to keeping this node alive and thriving, making it a joy to evolve and improve over time. Whether it's refining existing features or adding new capabilities, contributing should always be an enjoyable experience.
-
-Feel free to join the journey—create issues, submit pull requests, or share your ideas. Let’s build something incredible together!
+Issues, pull requests, and ideas are welcome — see [CHANGELOG.md](CHANGELOG.md) for recent changes.
 
 ## License
 
