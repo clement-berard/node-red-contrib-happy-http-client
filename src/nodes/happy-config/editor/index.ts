@@ -1,7 +1,9 @@
 import { createEditorNode, type NodeEditorProps } from '@keload/node-red-dxp/editor';
 import { initTabs } from '@keload/node-red-dxp/editor/dom-helper';
 
-import { applyTypedField, getCommonDefaultFields, initAuthFields } from '../../../common/editor/commonNodeEditor';
+import { initAuthFields } from '../../../common/editor/authFields';
+import { getCommonDefaultFields } from '../../../common/editor/defaultFields';
+import { applyTypedField } from '../../../common/editor/typedField';
 import type { NodeHappyConfigCredentials, NodeHappyConfigProps } from '../../../common/nodeTypes';
 
 const HappyConfig = createEditorNode<NodeEditorProps<NodeHappyConfigProps>, NodeHappyConfigCredentials>({

@@ -42,6 +42,8 @@ export interface NodeHappyRequestProps extends CommonNodeFields {
   splitBooleanOutputs: boolean;
   outputs: number;
   responseFormat: RequestOptions['dataType'];
+  beforeRequestScript: string;
+  afterResponseScript: string;
 }
 
 export interface NodeHappyRequestPropsCredentials {

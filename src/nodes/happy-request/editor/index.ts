@@ -1,7 +1,14 @@
 import { createEditorNode, type NodeEditorProps } from '@keload/node-red-dxp/editor';
-import { initSelect, initTabs, isCheckboxChecked } from '@keload/node-red-dxp/editor/dom-helper';
+import { initSelect, initTabs, isCheckboxChecked, jqSelector } from '@keload/node-red-dxp/editor/dom-helper';
 
-import { applyTypedField, getCommonDefaultFields, initAuthFields } from '../../../common/editor/commonNodeEditor';
+import { initAuthFields } from '../../../common/editor/authFields';
+import {
+  applyCodeEditorField,
+  disposeCodeEditorFields,
+  resizeCodeEditorFields,
+} from '../../../common/editor/codeEditorField';
+import { getCommonDefaultFields } from '../../../common/editor/defaultFields';
+import { applyTypedField } from '../../../common/editor/typedField';
 import { HTTP_METHODS, REQUEST_BODY_CONTENT_TYPES, REQUEST_RESPONSE_FORMAT } from '../../../common/httpClient';
 import type { NodeHappyRequestProps, NodeHappyRequestPropsCredentials } from '../../../common/nodeTypes';
 
@@ -21,6 +28,8 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>, No
     bodyContentType: { value: 'json', required: false },
     bodyType: { value: 'msg', required: false },
     responseFormat: { value: 'json' },
+    beforeRequestScript: { value: '' },
+    afterResponseScript: { value: '' },
     ...getCommonDefaultFields({ forConfig: false }),
   },
   credentials: {
@@ -38,6 +47,10 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>, No
   },
   oneditsave: function () {
     this.outputs = isCheckboxChecked('$splitBooleanOutputs') ? 2 : 1;
+    disposeCodeEditorFields({ persist: true });
+  },
+  oneditcancel: () => {
+    disposeCodeEditorFields({ persist: false });
   },
   label: function () {
     return this.name || 'HappyRequest';
@@ -117,6 +130,27 @@ const HappyRequest = createEditorNode<NodeEditorProps<NodeHappyRequestProps>, No
         selected: this.bodyContentType,
       },
     );
+
+    applyCodeEditorField({
+      selector: '$beforeRequestScript',
+      globals: { request: true, msg: true, node: true },
+    });
+
+    applyCodeEditorField({
+      selector: '$afterResponseScript',
+      globals: { msg: true, node: true },
+    });
+
+    // The Response tab (and its ACE editor) starts hidden — dxp's initTabs
+    // just toggles a `.hidden` class, it doesn't trigger an ACE resize the
+    // way node-red core's own tab widget does. An ACE editor created inside
+    // a display:none container can render at 0 height until explicitly
+    // resized, so re-layout on every tab click as a cheap safeguard.
+    jqSelector('#tabs-request-node')
+      .find('li')
+      .on('click', () => {
+        setTimeout(resizeCodeEditorFields, 0);
+      });
   },
 });
 

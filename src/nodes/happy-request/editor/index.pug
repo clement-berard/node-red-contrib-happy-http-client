@@ -15,7 +15,18 @@ include ../../../common/editor/commonFields
             +dxpHint Body content type
         +requestFieldsKeepAlive({isConfig: false})
         +requestFieldsConnectionTimeout({isConfig: false})
+        +dxpFormTitleSeparator('Scripting')
+        +dxpFormRowCodeEditor({ id: 'beforeRequestScript', label: 'Before Request', icon: 'code' })
+            +dxpHint(fullWidth=true)
+                | Optional. Runs just before the call: function(request, msg, node). Mutate or return
+                |  { url, method, headers, queryParams, body, bodyContentType } to override. May return a Promise.
+                |  On error, nothing is sent.
     #tab-response.hidden
+        +dxpFormRowCodeEditor({ id: 'afterResponseScript', label: 'Transform Response', icon: 'code' })
+            +dxpHint(fullWidth=true)
+                | Optional. Runs after the response msg is built: function(msg, node). MUST return the msg to
+                |  send onward (msg.payload / msg.happyRequest). May return a Promise. On error, nothing is sent.
+        +dxpFormTitleSeparator('Response')
         +dxpFormRowCheckbox({
             id: "throwErrorOnError",
             label: "Throw Error",

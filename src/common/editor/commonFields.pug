@@ -8,6 +8,22 @@ mixin pkgComingSoon
     .alert.alert-info.italic
         | Coming soon...
 
+mixin dxpFormRowCodeEditor(params)
+    - var inputId = generateInputId(params.id, params.isConfig)
+    - var i18nKey = params.i18nKey || params.id
+    - var height = params.height || '220px'
+    .dxp-template-form-row(class=params.rowClasses)
+        +commonLabel({label: params.label, icon: params.icon, id: inputId, i18nKey })
+        .content
+            input(type="hidden" id=inputId)
+            div(style="position: relative;")
+                div.node-text-editor(id=`${inputId}-editor` style=`height: ${height}; min-height: 150px;`)
+                div(style="position: absolute; right:0; bottom: calc(100% - 20px); z-index: 10;")
+                    button(type="button" id=`${inputId}-expand` class="red-ui-button red-ui-button-small")
+                        i.fa.fa-expand
+            if block
+                block
+
 mixin commonRequestFields(params)
     +dxpFormRowInputText({
         id: 'defaultArgsHeaders',

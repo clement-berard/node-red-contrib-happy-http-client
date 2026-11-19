@@ -4,6 +4,7 @@ import { getREDNode, splitBooleanOutputs } from '@keload/node-red-dxp/utils/cont
 import type { NodeMessage } from 'node-red';
 import { HttpClient } from 'urllib';
 import { resolveRequestInformation } from '../../common/controller/reqInfo';
+import { runUserScript } from '../../common/controller/utils/userScript';
 import { handleRequest } from '../../common/httpClient';
 import type { NodeHappyConfigAllProps, NodeHappyRequestAllProps } from '../../common/nodeTypes';
 
@@ -26,25 +27,66 @@ export default function (
 
   this.on('input', async (msg) => {
     this.status({});
-    const {
-      resolvedRequestHeaders,
-      resolvedRequestQueryParams,
-      resolvedRequestMethod,
-      resolvedRequestBody,
-      resolvedRequestBodyContentType,
-      resolvedConnectionTimeout,
-      resolvedConnectionKeepAlive,
-      resolvedCaRejectUnauthorized,
-      urlToFetch,
-      resolvedRequestAuth,
-    } = await resolveRequestInformation({
+    const resolvedRequestInfo = await resolveRequestInformation({
       node: this,
       msg,
       currentNode: { ...config, credentials: this.credentials },
       clientInstance,
     });
 
+    let {
+      resolvedRequestHeaders,
+      resolvedRequestQueryParams,
+      resolvedRequestMethod,
+      resolvedRequestBody,
+      resolvedRequestBodyContentType,
+      urlToFetch,
+    } = resolvedRequestInfo;
+
+    const {
+      resolvedConnectionTimeout,
+      resolvedConnectionKeepAlive,
+      resolvedCaRejectUnauthorized,
+      resolvedRequestAuth,
+    } = resolvedRequestInfo;
+
     const dateNow = new Date().toLocaleString();
+
+    if (config.beforeRequestScript) {
+      const requestForScript = {
+        url: urlToFetch,
+        method: resolvedRequestMethod,
+        headers: resolvedRequestHeaders,
+        queryParams: resolvedRequestQueryParams,
+        body: resolvedRequestBody,
+        bodyContentType: resolvedRequestBodyContentType,
+      };
+
+      try {
+        const overrides = await runUserScript<Partial<typeof requestForScript> | undefined>(
+          config.beforeRequestScript,
+          ['request', 'msg', 'node'],
+          [requestForScript, msg, this],
+        );
+
+        const resolvedOverrides = overrides && typeof overrides === 'object' ? overrides : requestForScript;
+
+        if (resolvedOverrides.url !== undefined) urlToFetch = resolvedOverrides.url;
+        if (resolvedOverrides.method !== undefined) resolvedRequestMethod = resolvedOverrides.method;
+        if (resolvedOverrides.headers !== undefined) resolvedRequestHeaders = resolvedOverrides.headers;
+        if (resolvedOverrides.queryParams !== undefined) resolvedRequestQueryParams = resolvedOverrides.queryParams;
+        if (resolvedOverrides.body !== undefined) resolvedRequestBody = resolvedOverrides.body;
+        if (resolvedOverrides.bodyContentType !== undefined)
+          resolvedRequestBodyContentType = resolvedOverrides.bodyContentType;
+      } catch (scriptErr: any) {
+        this.error(scriptErr, msg);
+        this.status({
+          fill: 'red',
+          text: `Before-request script error at ${dateNow}`,
+        });
+        return;
+      }
+    }
 
     const isValidUrl = isUrl(urlToFetch);
 
@@ -101,11 +143,34 @@ export default function (
       });
     }
 
-    const msgResponse = {
+    let msgResponse = {
       ...msg,
       happyRequest: res,
       payload: data,
     };
+
+    if (config.afterResponseScript) {
+      try {
+        const transformed = await runUserScript<typeof msgResponse | undefined>(
+          config.afterResponseScript,
+          ['msg', 'node'],
+          [msgResponse, this],
+        );
+
+        if (!transformed || typeof transformed !== 'object') {
+          throw new Error('Transform response script must return the msg object');
+        }
+
+        msgResponse = transformed;
+      } catch (scriptErr: any) {
+        this.error(scriptErr, msg);
+        this.status({
+          fill: 'red',
+          text: `Response script error at ${dateNow}`,
+        });
+        return;
+      }
+    }
 
     if (res.ok) {
       this.status({
