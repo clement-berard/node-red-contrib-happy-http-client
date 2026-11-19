@@ -2,7 +2,7 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { HttpClient } from 'urllib';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { handleRequest } from '../src/common/httpClient';
+import { handleRequest } from '../httpClient';
 import { createTestServer } from './server';
 
 let server: Server;

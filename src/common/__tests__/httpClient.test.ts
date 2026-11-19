@@ -6,7 +6,7 @@ import {
   REQUEST_BODY_CONTENT_TYPES,
   REQUEST_RESPONSE_FORMAT,
   resolveUrlWithBase,
-} from './httpClient';
+} from '../httpClient';
 
 describe('httpClient', () => {
   describe('Constants', () => {
@@ -115,6 +115,32 @@ describe('httpClient', () => {
       expect(error).toBe(mockError);
       expect(data).toBeUndefined();
       expect(response.ok).toBe(false);
+    });
+
+    it('should report the status when the error answer cannot be parsed', async () => {
+      const parseError = Object.assign(new SyntaxError('Unexpected token <'), { res: { status: 404, headers: {} } });
+      const mockClient: HttpClient = { request: vi.fn().mockRejectedValue(parseError) } as any;
+
+      const [error, , response] = await handleRequest({ url: 'https://api.example.com/users', client: mockClient });
+
+      expect(error?.message).toBe('Request failed with status 404 (https://api.example.com/users)');
+      expect(error?.cause).toBe(parseError);
+      expect(response.ok).toBe(false);
+      expect(response.response).toEqual({ status: 404, headers: {} });
+      expect(response).toMatchObject({ status: 404 });
+    });
+
+    it('should say the body is invalid when a successful answer cannot be parsed', async () => {
+      const parseError = Object.assign(new SyntaxError('Unexpected token <'), { res: { status: 200 } });
+      const mockClient: HttpClient = { request: vi.fn().mockRejectedValue(parseError) } as any;
+
+      const [error] = await handleRequest({
+        url: 'https://api.example.com/users',
+        client: mockClient,
+        reqOptions: { dataType: 'json' },
+      });
+
+      expect(error?.message).toBe('Invalid json response (status 200): Unexpected token <');
     });
 
     it('should pass request options to client', async () => {

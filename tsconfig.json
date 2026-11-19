@@ -9,14 +9,8 @@
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "rootDir": "./",
-    "types": ["jquery", "jqueryui", "node-red", "@keload/node-red-dxp"]
+    "types": ["node-red", "@keload/node-red-dxp"]
   },
   "include": ["./src/**/*.ts"],
-  "exclude": [
-    "./src/editor.ts",
-    "./src/editor/**/*",
-    "./src/nodes/**/editor/**/*",
-    "./src/nodes/**/editor.*",
-    "./test"
-  ]
+  "exclude": ["./test"]
 }
