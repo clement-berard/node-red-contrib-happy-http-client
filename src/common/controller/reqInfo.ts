@@ -1,12 +1,11 @@
 import { useControllerNode } from '@keload/node-red-dxp/utils/controller';
 import type { Node, NodeMessage } from 'node-red';
 import { assign, isEmpty } from 'radash';
-import { resolveUrlWithBase } from '../httpClient';
+import type { HttpMethod } from 'urllib';
+import { CONSTANTS } from '../constants';
+import { COMMON_FIELDS } from '../editor/commonFields';
+import { HTTP_METHODS, resolveUrlWithBase } from '../httpClient';
 import type { NodeHappyConfigAllProps, NodeHappyRequestAllProps } from '../nodeTypes';
-import { getComputedClientInstance } from './configInstance';
-import { getComputedNodeInstance } from './nodeInstance';
-import { evaluatePipeline } from './utils/pipeline';
-import { REQUEST_SCHEMA } from './utils/requestSchema';
 
 type ResolveRequestInformationParams = {
   node: Node;
@@ -15,87 +14,76 @@ type ResolveRequestInformationParams = {
   clientInstance: NodeHappyConfigAllProps | null;
 };
 
+type Dict = Record<string, string>;
+
+// the settings the request node can inherit from its client, with their default value
+const INHERITABLE_FIELDS = Object.fromEntries(
+  Object.entries(COMMON_FIELDS)
+    .filter(([, field]) => field.inherit)
+    .map(([key, field]) => [key, field.value]),
+);
+const OBJECT_FIELDS = { defaultArgsHeaders: {}, defaultArgsQueryParams: {} };
+
 export async function resolveRequestInformation(params: ResolveRequestInformationParams) {
-  const { quickNodePropertyEval } = useControllerNode(params.node, params.msg);
+  const { node, msg, currentNode, clientInstance } = params;
+  const { quickNodePropertyEval, evalProps, resolveInherited } = useControllerNode(node, msg);
+  const client = clientInstance ?? {};
 
-  const [configInstance, nodeInstance] = await Promise.all([
-    getComputedClientInstance({
-      node: params.node,
-      msg: params.msg,
-      clientInstance: params.clientInstance,
+  const [own, method, inherited, ownObjects, clientObjects] = await Promise.all([
+    evalProps(currentNode, { endpoint: undefined, body: undefined, bodyContentType: undefined }),
+    HTTP_METHODS.includes(currentNode.methodType)
+      ? currentNode.methodType
+      : quickNodePropertyEval(currentNode, 'method'),
+    resolveInherited({
+      node: currentNode,
+      parent: clientInstance,
+      inheritType: CONSTANTS.INHERIT_CLIENT_TERM,
+      fields: INHERITABLE_FIELDS,
     }),
-    getComputedNodeInstance({
-      node: params.node,
-      msg: params.msg,
-      currentNode: params.currentNode,
-    }),
+    evalProps(currentNode, OBJECT_FIELDS),
+    evalProps(client, OBJECT_FIELDS),
   ]);
+  const merged = (key: keyof typeof OBJECT_FIELDS) =>
+    assign((clientObjects[key] as Dict) || {}, (ownObjects[key] as Dict) || {});
 
-  const rawFlags = (nodeInstance.isFromClient || {}) as unknown as Record<string, boolean>;
-  const targetNode = (nodeInstance.currentNodeInstance || {}) as unknown as Record<string, unknown>;
-  const targetClient = (configInstance.currentClientInstance || {}) as unknown as Record<string, unknown>;
+  // the kind has no typedInput: the node can only ask for the one of its client (`from_client_or_none`)
+  const kind =
+    currentNode.requestAuthKind === `${CONSTANTS.INHERIT_CLIENT_TERM}_or_none`
+      ? clientInstance?.requestAuthKind
+      : currentNode.requestAuthKind;
+  const inheritsUsername =
+    currentNode.requestAuthUsernameType === CONSTANTS.INHERIT_CLIENT_TERM && clientInstance?.requestAuthKind !== 'none';
 
-  const results = await evaluatePipeline({
-    schema: REQUEST_SCHEMA,
-    evaluator: quickNodePropertyEval,
-    clientTarget: targetClient,
-    nodeTarget: targetNode,
-    inheritFlags: rawFlags,
-  });
-
-  const realAuthKind =
-    results.requestAuthKind.nodeVal === 'from_client_or_none'
-      ? results.requestAuthKind.clientVal
-      : results.requestAuthKind.nodeVal;
-
-  const hasAuthKind = realAuthKind !== undefined && realAuthKind !== 'none';
-
-  const shouldInheritUsername = rawFlags.requestAuthUsername && results.requestAuthKind.clientVal !== 'none';
-  const resolvedRequestAuthUsername =
-    shouldInheritUsername && results.requestAuthUsername.clientVal !== undefined
-      ? results.requestAuthUsername.clientVal
-      : results.requestAuthUsername.nodeVal;
-
-  const resolvedRequestAuthPasswordSecret =
-    nodeInstance?.credentials?.requestAuthPasswordSecret ||
-    configInstance?.credentials?.requestAuthPasswordSecret ||
-    '';
-
-  const resolvedRequestAuthBearerToken = results.requestAuthBearerToken.finalValue as string | undefined;
-
-  const requestHeaders: Record<string, string> = {
-    ...assign(
-      (results.defaultArgsHeaders.clientVal as Record<string, string>) || {},
-      (results.defaultArgsHeaders.nodeVal as Record<string, string>) || {},
-    ),
-    ...(resolvedRequestAuthBearerToken && {
-      authorization: `Bearer ${resolvedRequestAuthBearerToken}`,
-    }),
-  };
-
-  const urlToFetch = !isEmpty(configInstance?.clientInstanceBaseUrl)
-    ? resolveUrlWithBase(configInstance.clientInstanceBaseUrl as string, nodeInstance.resolvedNodeEndpoint as string)
-    : nodeInstance.resolvedNodeEndpoint;
+  const hasAuth = Boolean(kind) && kind !== 'none';
+  const bearer = inherited.requestAuthBearerToken.value as string | undefined;
+  const baseUrl = clientInstance?.baseUrl;
+  const endpoint = own.endpoint as string;
 
   return {
-    resolvedRequestHeaders: requestHeaders,
-    resolvedRequestQueryParams: assign(
-      (results.defaultArgsQueryParams.clientVal as Record<string, string>) || {},
-      (results.defaultArgsQueryParams.nodeVal as Record<string, string>) || {},
-    ),
-    resolvedRequestMethod: nodeInstance.nodeInstanceMethod,
-    resolvedRequestBody: nodeInstance.nodeInstanceBody,
-    resolvedRequestBodyContentType: nodeInstance.nodeInstanceBodyContentType,
-    urlToFetch,
-    resolvedConnectionTimeout: results.connectionTimeout.finalValue,
-    resolvedConnectionKeepAlive: results.connectionKeepAlive.finalValue,
-    resolvedCaRejectUnauthorized: results.caRejectUnauthorized.finalValue,
-    resolvedRequestAuthBearerToken,
-    resolvedRequestAuth: {
-      hasAuth: hasAuthKind,
-      authKind: realAuthKind as 'basic' | 'digest',
-      username: resolvedRequestAuthUsername,
-      password: resolvedRequestAuthPasswordSecret,
+    request: {
+      url: isEmpty(baseUrl) ? endpoint : resolveUrlWithBase(baseUrl as string, endpoint),
+      method: method as HttpMethod,
+      headers: { ...merged('defaultArgsHeaders'), ...(bearer && { authorization: `Bearer ${bearer}` }) },
+      queryParams: merged('defaultArgsQueryParams'),
+      // undefined when the field is empty or evaluates to nothing: no body is sent
+      body: own.body === '' ? undefined : own.body,
+      bodyContentType: own.bodyContentType as string | undefined,
     },
+    connection: {
+      timeout: inherited.connectionTimeout.value,
+      keepAlive: inherited.connectionKeepAlive.value,
+      rejectUnauthorized: inherited.caRejectUnauthorized.value,
+    },
+    /** `undefined` when the request is not authenticated. */
+    auth: hasAuth
+      ? {
+          kind: kind as 'basic' | 'digest',
+          username: inheritsUsername ? inherited.requestAuthUsername.value : inherited.requestAuthUsername.own,
+          password:
+            currentNode.credentials?.requestAuthPasswordSecret ||
+            clientInstance?.credentials?.requestAuthPasswordSecret ||
+            '',
+        }
+      : undefined,
   };
 }

@@ -1,3 +1,4 @@
+import { HttpClient } from 'urllib';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { handleRequestMock, resolveRequestInformationMock } = vi.hoisted(() => ({
@@ -7,14 +8,15 @@ const { handleRequestMock, resolveRequestInformationMock } = vi.hoisted(() => ({
 
 vi.mock('urllib', () => ({ HttpClient: vi.fn() }));
 vi.mock('@keload/node-red-dxp/utils', () => ({ isUrl: (url: string) => /^https?:\/\//.test(url) }));
-vi.mock('@keload/node-red-dxp/utils/controller', () => ({
+vi.mock('@keload/node-red-dxp/utils/controller', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   getREDNode: vi.fn(() => null),
   splitBooleanOutputs: (isSuccess: boolean, msg: unknown) => (isSuccess ? [msg, null] : [null, msg]),
 }));
-vi.mock('../../common/controller/reqInfo', () => ({ resolveRequestInformation: resolveRequestInformationMock }));
-vi.mock('../../common/httpClient', () => ({ handleRequest: handleRequestMock }));
+vi.mock('../../../common/controller/reqInfo', () => ({ resolveRequestInformation: resolveRequestInformationMock }));
+vi.mock('../../../common/httpClient', () => ({ handleRequest: handleRequestMock }));
 
-import controller from './controller';
+import controller from '../controller';
 
 type InputHandler = (msg: Record<string, unknown>) => Promise<void>;
 
@@ -40,16 +42,16 @@ describe('happy-request controller', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resolveRequestInformationMock.mockResolvedValue({
-      resolvedRequestHeaders: { a: '1' },
-      resolvedRequestQueryParams: { q: 'x' },
-      resolvedRequestMethod: 'POST',
-      resolvedRequestBody: { b: 1 },
-      resolvedRequestBodyContentType: 'json',
-      urlToFetch: 'https://api.test/items',
-      resolvedConnectionTimeout: 1000,
-      resolvedConnectionKeepAlive: 1000,
-      resolvedCaRejectUnauthorized: true,
-      resolvedRequestAuth: { hasAuth: false },
+      request: {
+        url: 'https://api.test/items',
+        method: 'POST',
+        headers: { a: '1' },
+        queryParams: { q: 'x' },
+        body: { b: 1 },
+        bodyContentType: 'json',
+      },
+      connection: { timeout: 1000, keepAlive: 1000, rejectUnauthorized: true },
+      auth: undefined,
     });
     handleRequestMock.mockResolvedValue([undefined, { ok: true }, { ok: true, response: { status: 200 } }]);
   });
@@ -197,6 +199,121 @@ describe('happy-request controller', () => {
       expect(node.status).toHaveBeenCalledWith(
         expect.objectContaining({ fill: 'red', text: expect.stringContaining('Error 500') }),
       );
+    });
+  });
+
+  describe('request', () => {
+    it('should configure the http client with the resolved connection settings', async () => {
+      resolveRequestInformationMock.mockResolvedValue({
+        ...(await resolveRequestInformationMock()),
+        connection: { timeout: '3000', keepAlive: '1500', rejectUnauthorized: false },
+      });
+      const { input } = setup();
+      await input();
+
+      expect(HttpClient).toHaveBeenCalledWith({ connect: { timeout: 3000, rejectUnauthorized: false } });
+      expect(handleRequestMock.mock.calls[0][0].reqOptions.keepAliveTimeout).toBe(1500);
+    });
+
+    it('should pass the response format and the body content type', async () => {
+      const { input } = setup({ responseFormat: 'text' });
+      await input();
+
+      const { reqOptions } = handleRequestMock.mock.calls[0][0];
+      expect(reqOptions.dataType).toBe('text');
+      expect(reqOptions.contentType).toBe('json');
+    });
+
+    it('should not send a body with a GET request', async () => {
+      resolveRequestInformationMock.mockResolvedValue({
+        ...(await resolveRequestInformationMock()),
+        request: { ...(await resolveRequestInformationMock()).request, method: 'GET' },
+      });
+      const { input } = setup();
+      await input();
+
+      expect(handleRequestMock.mock.calls[0][0].reqOptions).not.toHaveProperty('data');
+    });
+
+    it('should send neither a body nor a content type when there is none', async () => {
+      resolveRequestInformationMock.mockResolvedValue({
+        ...(await resolveRequestInformationMock()),
+        request: { ...(await resolveRequestInformationMock()).request, body: undefined },
+      });
+      const { input } = setup();
+      await input();
+
+      const { reqOptions } = handleRequestMock.mock.calls[0][0];
+      expect(reqOptions).not.toHaveProperty('data');
+      expect(reqOptions).not.toHaveProperty('contentType');
+    });
+
+    it.each([
+      ['basic', 'auth'],
+      ['digest', 'digestAuth'],
+    ])('should send the %s credentials as `%s`', async (kind, option) => {
+      resolveRequestInformationMock.mockResolvedValue({
+        ...(await resolveRequestInformationMock()),
+        auth: { kind, username: 'bob', password: 'pwd' },
+      });
+      const { input } = setup();
+      await input();
+
+      const { reqOptions } = handleRequestMock.mock.calls[0][0];
+      expect(reqOptions[option]).toBe('bob:pwd');
+      expect(reqOptions[option === 'auth' ? 'digestAuth' : 'auth']).toBeUndefined();
+    });
+
+    it('should send no credentials without auth', async () => {
+      const { input } = setup();
+      await input();
+
+      const { reqOptions } = handleRequestMock.mock.calls[0][0];
+      expect(reqOptions).not.toHaveProperty('auth');
+      expect(reqOptions).not.toHaveProperty('digestAuth');
+    });
+  });
+
+  describe('status', () => {
+    it('should reset the status when a message arrives', async () => {
+      const { input, node } = setup();
+      await input();
+
+      expect(node.status).toHaveBeenNthCalledWith(1, {});
+      expect(node.status).toHaveBeenNthCalledWith(2, {});
+    });
+
+    it('should mention the time of the success', async () => {
+      const { input, node } = setup();
+      await input();
+
+      expect(node.status).toHaveBeenLastCalledWith({ fill: 'green', text: expect.stringMatching(/^Success at /) });
+    });
+
+    it('should report a request failure without crashing when there is no response', async () => {
+      handleRequestMock.mockResolvedValue([new Error('ECONNREFUSED'), undefined, { ok: false }]);
+      const { input, node } = setup({ throwErrorOnError: true });
+      await input();
+
+      expect(node.error).toHaveBeenCalledWith({ message: 'ECONNREFUSED', response: undefined });
+      expect(node.send).toHaveBeenCalledOnce();
+    });
+
+    it('should show the status of an answer that could not be parsed', async () => {
+      handleRequestMock.mockResolvedValue([new Error('bad json'), undefined, { ok: false, response: { status: 400 } }]);
+      const { input, node } = setup({ throwErrorOnError: true });
+      await input();
+
+      expect(node.status).toHaveBeenCalledWith({ fill: 'red', text: expect.stringMatching(/^Error 400 at /) });
+    });
+
+    it('should still send the msg on failure when errors are not thrown', async () => {
+      handleRequestMock.mockResolvedValue([new Error('fail'), undefined, { ok: false, response: { status: 404 } }]);
+      const { input, node } = setup({ throwErrorOnError: false });
+      await input();
+
+      expect(node.error).not.toHaveBeenCalled();
+      expect(node.send).toHaveBeenCalledOnce();
     });
   });
 });

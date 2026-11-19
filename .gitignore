@@ -22,3 +22,7 @@ dist
 
 # temp builder files
 .node-red-dxp
+
+# test reports
+coverage
+.vitest

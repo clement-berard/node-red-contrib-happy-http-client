@@ -67,7 +67,24 @@ export async function handleRequest(params: HandleRequestParams) {
 
     return [undefined, resp.data, commonResponse] as const;
   } catch (error: any) {
-    return [error as Error, undefined, { ok: false, ...error.res }] as const;
+    // `error.res` is set when the server answered but the body could not be read (a html page asked as json, for
+    // instance): report what happened to the request rather than the parsing error, and keep the status reachable
+    // at the same place as for any response
+    const status: number | undefined = error.res?.status;
+    const failure =
+      typeof status !== 'number'
+        ? error
+        : status >= 200 && status < 300
+          ? new Error(`Invalid ${reqOptions.dataType ?? 'json'} response (status ${status}): ${error.message}`, {
+              cause: error,
+            })
+          : new Error(`Request failed with status ${status} (${fullUrl})`, { cause: error });
+
+    return [
+      failure as Error,
+      undefined,
+      { ok: false, request: { url: fullUrl, reqOptions }, ...error.res, response: error.res },
+    ] as const;
   }
 }
 
