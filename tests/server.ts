@@ -1,73 +1,68 @@
-import basicAuth from 'basic-auth';
-import express, { type NextFunction, type Request, type Response } from 'express';
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { fileURLToPath } from 'node:url';
 
-// import jwt from 'jsonwebtoken';
+const DEFAULT_PORT = 3002;
 
-const app = express();
-const PORT = 3002;
-// const BEARER_SECRET = 'your-secret-key'; // Change this secret to a secure one
+function send(res: ServerResponse, status: number, body: string, headers: Record<string, string> = {}) {
+  res.writeHead(status, { 'Content-Type': 'text/plain', ...headers });
+  res.end(body);
+}
 
-// Middleware for Basic Auth
-const basicAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const user = basicAuth(req);
-  const _authHeader = req.headers.authorization;
+function isBasicAuthOk(req: IncomingMessage) {
+  const [scheme, encoded] = (req.headers.authorization ?? '').split(' ');
+  if (scheme !== 'Basic' || !encoded) return false;
+  return Buffer.from(encoded, 'base64').toString() === 'admin:password';
+}
 
-  if (user && user.name === 'admin' && user.pass === 'password') {
-    // Change username and password
-    return next();
-  }
-  res.set('WWW-Authenticate', 'Basic realm="example"');
-  return res.status(401).send('Access denied.');
-};
+function isBearerAuthOk(req: IncomingMessage) {
+  const [scheme, token] = (req.headers.authorization ?? '').split(' ');
+  return scheme === 'Bearer' && token === 'tonton';
+}
 
-// Middleware for Bearer Token Auth
-const bearerAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  console.log('authHeader', authHeader);
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1];
-    console.log('token', token);
-    try {
-      // jwt.verify(token, BEARER_SECRET);
-      if (token === 'tonton') return next();
-    } catch (_err) {
-      return res.status(403).send('Invalid token.');
+export function createTestServer() {
+  return createServer(async (req, res) => {
+    const url = new URL(req.url ?? '/', 'http://localhost');
+
+    // Public route used as a proxy
+    if (req.method === 'GET' && url.pathname === '/proxy') {
+      const target = url.searchParams.get('url');
+      if (!target) return send(res, 400, 'Missing or invalid URL parameter.');
+
+      try {
+        const response = await fetch(target);
+        return send(res, response.status, await response.text());
+      } catch (_error) {
+        return send(res, 500, 'Failed to fetch data from the external API.');
+      }
     }
-  }
-  return res.status(401).send('Token missing or malformed.');
-};
 
-// Public route used as a proxy
-app.get('/proxy', async (req: Request, res: Response) => {
-  const { url } = req.query;
-  if (!url || typeof url !== 'string') {
-    return res.status(400).send('Missing or invalid URL parameter.');
-  }
+    // Protected route with Basic Auth
+    if (req.method === 'GET' && url.pathname === '/protected-basic') {
+      if (!isBasicAuthOk(req)) {
+        return send(res, 401, 'Access denied.', { 'WWW-Authenticate': 'Basic realm="example"' });
+      }
+      return send(res, 200, 'This is a protected route using Basic Auth.');
+    }
 
-  try {
-    const response = await fetch(url);
-    const data = await response.text();
-    res.status(response.status).send(data);
-  } catch (_error) {
-    res.status(500).send('Failed to fetch data from the external API.');
-  }
-});
+    // Protected route with Bearer Token
+    if (req.method === 'GET' && url.pathname === '/protected-bearer') {
+      if (!isBearerAuthOk(req)) return send(res, 401, 'Token missing or malformed.');
+      return send(res, 200, JSON.stringify({ ok: 'This is a protected route using Bearer Token Auth.' }), {
+        'Content-Type': 'application/json',
+      });
+    }
 
-// Protected route with Basic Auth
-app.get('/protected-basic', basicAuthMiddleware, (_req: Request, res: Response) => {
-  res.send('This is a protected route using Basic Auth.');
-});
+    return send(res, 404, 'Not found.');
+  });
+}
 
-// Protected route with Bearer Token
-app.get('/protected-bearer', bearerAuthMiddleware, (_req: Request, res: Response) => {
-  res.json({ ok: 'This is a protected route using Bearer Token Auth.' });
-});
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  console.log('Routes:');
-  console.log(`- Public Proxy: http://localhost:${PORT}/proxy?url=<external-api-url>`);
-  console.log(`- Basic Auth Protected: http://localhost:${PORT}/protected-basic`);
-  console.log(`- Bearer Token Protected: http://localhost:${PORT}/protected-bearer`);
-});
+// Run standalone: `tsx tests/server.ts`
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  createTestServer().listen(DEFAULT_PORT, () => {
+    console.log(`Server is running on http://localhost:${DEFAULT_PORT}`);
+    console.log('Routes:');
+    console.log(`- Public Proxy: http://localhost:${DEFAULT_PORT}/proxy?url=<external-api-url>`);
+    console.log(`- Basic Auth Protected: http://localhost:${DEFAULT_PORT}/protected-basic`);
+    console.log(`- Bearer Token Protected: http://localhost:${DEFAULT_PORT}/protected-bearer`);
+  });
+}
