@@ -3,7 +3,7 @@
   "version": "2.0.1",
   "description": "Fresh way to manage HTTP requests",
   "engines": {
-    "node": ">=24"
+    "node": ">=22.0.0"
   },
   "publishConfig": {
     "access": "public"
@@ -54,7 +54,8 @@
   },
   "homepage": "https://github.com/clement-berard/node-red-contrib-happy-http-client",
   "files": [
-    "dist"
+    "dist",
+    "examples"
   ],
   "dependencies": {
     "urllib": "4.9.0"
