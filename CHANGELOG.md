@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.1](https://github.com/clement-berard/node-red-contrib-happy-http-client/compare/v2.0.0...v2.0.1) (2026-11-20)
+
+### 📦 Chores
+
+* bump node-red-dxp to 2.5.0 ([#39](https://github.com/clement-berard/node-red-contrib-happy-http-client/issues/39)) ([55eba8b](https://github.com/clement-berard/node-red-contrib-happy-http-client/commit/55eba8b1e00502442c756a99637b01fcc1c2ec03))
+
 ## [2.0.0](https://github.com/clement-berard/node-red-contrib-happy-http-client/compare/v1.7.1...v2.0.0) (2026-11-19)
 
 ### ✨ Features
