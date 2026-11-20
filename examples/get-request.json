@@ -1,0 +1,47 @@
+[
+  {
+    "id": "happy-ex-config",
+    "type": "happy-config",
+    "name": "JSONPlaceholder",
+    "baseUrl": "https://jsonplaceholder.typicode.com"
+  },
+  {
+    "id": "happy-ex-inject",
+    "type": "inject",
+    "name": "Get todo",
+    "props": [],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "x": 130,
+    "y": 100,
+    "wires": [["happy-ex-request"]]
+  },
+  {
+    "id": "happy-ex-request",
+    "type": "happy-request",
+    "name": "GET /todos/1",
+    "clientInstance": "happy-ex-config",
+    "endpoint": "/todos/1",
+    "endpointType": "str",
+    "method": "GET",
+    "responseFormat": "json",
+    "x": 330,
+    "y": 100,
+    "wires": [["happy-ex-debug"]]
+  },
+  {
+    "id": "happy-ex-debug",
+    "type": "debug",
+    "name": "Response",
+    "active": true,
+    "tosidebar": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 530,
+    "y": 100,
+    "wires": []
+  }
+]
